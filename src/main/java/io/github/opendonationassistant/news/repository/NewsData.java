@@ -4,65 +4,67 @@ import io.github.opendonationassistant.news.News;
 import io.micronaut.data.annotation.Id;
 import io.micronaut.data.annotation.MappedEntity;
 import io.micronaut.serde.annotation.Serdeable;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 @Serdeable
 @MappedEntity("news")
 public class NewsData {
 
   @Id
-  private String id;
+  private @Nonnull String id;
 
-  private String title;
-  private String description;
-  private String date;
-  private String demoUrl;
+  private @Nonnull String title;
+  private @Nonnull String description;
+  private @Nonnull String date;
+  private @Nullable String demoUrl;
 
-  public News asNews(NewsDataRepository repository) {
+  public @Nonnull News asNews(@Nonnull NewsDataRepository repository) {
     return new News(id, title, description, date, demoUrl, repository);
   }
 
-  public String getDate() {
+  public @Nonnull String getDate() {
     return date;
   }
 
-  public void setDate(String date) {
+  public void setDate(@Nonnull String date) {
     this.date = date;
   }
 
-  public String getId() {
+  public @Nonnull String getId() {
     return id;
   }
 
-  public void setId(String id) {
+  public void setId(@Nonnull String id) {
     this.id = id;
   }
 
-  public String getTitle() {
+  public @Nonnull String getTitle() {
     return title;
   }
 
-  public void setTitle(String title) {
+  public void setTitle(@Nonnull String title) {
     this.title = title;
   }
 
-  public String getDescription() {
+  public @Nonnull String getDescription() {
     return description;
   }
 
-  public void setDescription(String description) {
+  public void setDescription(@Nonnull String description) {
     this.description = description;
   }
 
-  public String getDemoUrl() {
+  public @Nullable String getDemoUrl() {
     return demoUrl;
   }
 
-  public void setDemoUrl(String demoUrl) {
+  public void setDemoUrl(@Nullable String demoUrl) {
     this.demoUrl = demoUrl;
   }
 
   @Override
-  public String toString() {
+  public @Nonnull String toString() {
     return (
       "{\"_type\"=\"NewsData\",\"id\"=\"" +
       id +
@@ -76,12 +78,17 @@ public class NewsData {
     );
   }
 
-  public NewsData(){}
-
-  public NewsData(String id, String title, String description, String demoUrl) {
+  public NewsData(
+    @Nonnull String id,
+    @Nonnull String title,
+    @Nonnull String description,
+    @Nonnull String date,
+    @Nullable String demoUrl
+  ) {
     this.id = id;
     this.title = title;
     this.description = description;
+    this.date = date;
     this.demoUrl = demoUrl;
   }
 }

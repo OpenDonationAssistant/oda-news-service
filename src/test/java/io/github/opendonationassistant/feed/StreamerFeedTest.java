@@ -26,18 +26,21 @@ public class StreamerFeedTest {
       "1",
       "Title 1",
       "Description 1",
+      "date 1",
       "https://demo.url"
     );
     var second = new NewsData(
       "2",
       "Title 2",
       "Description 2",
+      "date 2",
       "https://demo.url"
     );
     var third = new NewsData(
       "3",
       "Title 3",
       "Description 3",
+      "date 3",
       "https://demo.url"
     );
 

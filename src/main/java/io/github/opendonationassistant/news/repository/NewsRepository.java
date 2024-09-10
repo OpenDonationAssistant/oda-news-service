@@ -55,12 +55,8 @@ public class NewsRepository {
     String date,
     String demoUrl
   ) {
-    NewsData newsData = new NewsData();
-    newsData.setId(Generators.timeBasedEpochGenerator().generate().toString());
-    newsData.setTitle(title);
-    newsData.setDate(date);
-    newsData.setDescription(description);
-    newsData.setDemoUrl(demoUrl);
+    var id = Generators.timeBasedEpochGenerator().generate().toString();
+    NewsData newsData = new NewsData(id, title, description, date, demoUrl);
     newsDataRepository.save(newsData);
     return newsData.asNews(newsDataRepository);
   }

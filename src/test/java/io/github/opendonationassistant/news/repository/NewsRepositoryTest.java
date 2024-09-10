@@ -25,7 +25,8 @@ public class NewsRepositoryTest {
   @Test
   public void testReturningEmptyAfterLastNews(@Given NewsData last) {
     when(newsDataRepository.findAll()).thenReturn(List.of(last));
-    Optional<News> actual = new NewsRepository(newsDataRepository).nextAfter(last.getId());
+    Optional<News> actual = new NewsRepository(newsDataRepository)
+      .nextAfter(last.getId());
     assertTrue(actual.isEmpty());
   }
 

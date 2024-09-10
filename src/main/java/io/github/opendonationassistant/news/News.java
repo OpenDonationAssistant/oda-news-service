@@ -3,23 +3,25 @@ package io.github.opendonationassistant.news;
 import io.github.opendonationassistant.news.repository.NewsData;
 import io.github.opendonationassistant.news.repository.NewsDataRepository;
 import io.github.opendonationassistant.news.view.NewsDto;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 public class News {
 
-  private final String id;
-  private final String title;
-  private final String description;
-  private final String date;
-  private final String demoUrl;
-  private final NewsDataRepository repository;
+  private final @Nonnull String id;
+  private final @Nonnull String title;
+  private final @Nonnull String description;
+  private final @Nonnull String date;
+  private final @Nullable String demoUrl;
+  private final @Nonnull NewsDataRepository repository;
 
   public News(
-    final String id,
-    final String title,
-    final String description,
-    final String date,
-    final String demoUrl,
-    final NewsDataRepository repository
+    final @Nonnull String id,
+    final @Nonnull String title,
+    final @Nonnull String description,
+    final @Nonnull String date,
+    final @Nullable String demoUrl,
+    final @Nonnull NewsDataRepository repository
   ) {
     this.id = id;
     this.title = title;
@@ -40,11 +42,7 @@ public class News {
   }
 
   public void save() {
-    NewsData data = new NewsData();
-    data.setId(id);
-    data.setTitle(title);
-    data.setDescription(description);
-    data.setDemoUrl(demoUrl);
+    NewsData data = new NewsData(id, title, description, date, demoUrl);
     repository.save(data);
   }
 
