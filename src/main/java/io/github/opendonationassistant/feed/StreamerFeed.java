@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 
 public class StreamerFeed {
 
-  private Logger log = LoggerFactory.getLogger(StreamerFeed.class);
+  private final Logger log = LoggerFactory.getLogger(StreamerFeed.class);
   private final @Nonnull String streamerId;
   private final @Nonnull StreamerFeedDataRepository repository;
   private final @Nonnull NewsRepository news;
