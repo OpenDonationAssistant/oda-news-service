@@ -41,11 +41,11 @@ jobs:
 
     - name: Commit & Push changes
       uses: actions-js/push@master
-      with:
-        github_token: ${{ secrets.PUSH_TOKEN }}
-        message: '[skip ci] up versions'
-        directory: scripts
-        repository: "OpenDonationAssistant/oda-k3s-specs"
+      run: | 
+        cd scripts
+        git commit -am "[skip ci] up version"
+        git remote set-url origin https://${{ secrets.PUSH_TOKEN }}@github.com/OpenDonationAssistant/oda-k3s-specs
+        git push
 
     - name: Build with Maven
       run: mvn -B package --file pom.xml -Dpackaging=native-image -DskipTests
