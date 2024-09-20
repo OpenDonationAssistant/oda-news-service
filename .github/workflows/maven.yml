@@ -40,7 +40,6 @@ jobs:
     - run: cat scripts/service-news.yaml
 
     - name: Commit & Push changes
-      uses: actions-js/push@master
       run: | 
         cd scripts
         git commit -am "[skip ci] up version"
