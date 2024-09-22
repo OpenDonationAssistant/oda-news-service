@@ -29,7 +29,7 @@ public class Application {
 
     @Override
     public void configure(@NonNull ApplicationContextBuilder builder) {
-      builder.defaultEnvironments("dev");
+      builder.defaultEnvironments("standalone");
     }
   }
 
