@@ -7,3 +7,5 @@ datasources:
 logger:
   levels:
     io.github.opendonationassistant: INFO
+    com.zaxxer.hikari: WARN
+    org.flywaydb.core: WARN
