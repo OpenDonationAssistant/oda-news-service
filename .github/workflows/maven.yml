@@ -27,6 +27,7 @@ jobs:
     - name: Checkout ansible scripts
       uses: actions/checkout@v4
       with:
+        token: ${{ secrets.PUSH_TOKEN }}
         repository: "OpenDonationAssistant/oda-k3s-specs"
         path: "scripts"
 
@@ -39,14 +40,14 @@ jobs:
 
     - run: cat scripts/service-news.yaml
 
-    # - name: Commit & Push changes
-    #   run: | 
-    #     cd scripts
-    #     git config --global user.email "stcarolas@gmail.com"
-    #     git config --global user.name "stCarolas"
-    #     git commit -am "[skip ci] up version"
-    #     git remote set-url origin https://${{ secrets.PUSH_TOKEN }}@github.com/OpenDonationAssistant/oda-k3s-specs
-    #     git push
+    - name: Commit & Push changes
+      run: | 
+        cd scripts
+        git config --global user.email "stcarolas@gmail.com"
+        git config --global user.name "stCarolas"
+        git commit -am "[skip ci] up version"
+        git remote set-url origin https://${{ secrets.PUSH_TOKEN }}@github.com/OpenDonationAssistant/oda-k3s-specs
+        git push
 
     - name: Build with Maven
       run: mvn -B package --file pom.xml -Dpackaging=native-image -DskipTests
