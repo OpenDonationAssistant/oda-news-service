@@ -6,6 +6,12 @@
         </encoder>
     </appender>
 
+    <logger name="org.flywaydb.core" level="WARN" />
+    <logger name="com.zaxxer.hikari" level="WARN" />
+    <logger name="io.micronaut.logging.PropertiesLoggingLevelsConfigurer"
+            level="WARN" />
+    <logger name="io.micronaut.flyway.AbstractFlywayMigration"
+            level="WARN" />
 
     <root level="info">
         <appender-ref ref="STDOUT" />
