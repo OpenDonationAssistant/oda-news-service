@@ -24,30 +24,28 @@ jobs:
       with:
         node-version: "20"
 
-    - name: Checkout ansible scripts
-      uses: actions/checkout@v4
-      with:
-        token: ${{ secrets.PUSH_TOKEN }}
-        repository: "OpenDonationAssistant/oda-k3s-specs"
-        path: "scripts"
-
-    - name: Update version
-      uses: teunmooij/yaml@v1
-      with:
-        from-file: 'scripts/service-news.yaml'
-        to-file: 'scripts/service-news.yaml'
-        merge: '{ "spec.template.spec.containers[0].image": "ghcr.io/opendonationassistant/oda-news-service:${{ github.RUN_NUMBER }}" }'
-
-    - run: cat scripts/service-news.yaml
-
-    - name: Commit & Push changes
-      run: | 
-        cd scripts
-        git config --global user.email "stcarolas@gmail.com"
-        git config --global user.name "stCarolas"
-        git commit -am "[skip ci] up version"
-        git remote set-url origin https://${{ secrets.PUSH_TOKEN }}@github.com/OpenDonationAssistant/oda-k3s-specs
-        git push
+    # - name: Checkout ansible scripts
+    #   uses: actions/checkout@v4
+    #   with:
+    #     token: ${{ secrets.PUSH_TOKEN }}
+    #     repository: "OpenDonationAssistant/oda-k3s-specs"
+    #     path: "scripts"
+    #
+    # - name: Update version
+    #   uses: teunmooij/yaml@v1
+    #   with:
+    #     from-file: 'scripts/service-news.yaml'
+    #     to-file: 'scripts/service-news.yaml'
+    #     merge: '{ "spec.template.spec.containers[0].image": "ghcr.io/opendonationassistant/oda-news-service:${{ github.RUN_NUMBER }}" }'
+    #
+    # - name: Commit & Push changes
+    #   run: |
+    #     cd scripts
+    #     git config --global user.email "stcarolas@gmail.com"
+    #     git config --global user.name "stCarolas"
+    #     git commit -am "[skip ci] up version"
+    #     git remote set-url origin https://${{ secrets.PUSH_TOKEN }}@github.com/OpenDonationAssistant/oda-k3s-specs
+    #     git push
 
     - name: Analyze with Sonar
       env:
