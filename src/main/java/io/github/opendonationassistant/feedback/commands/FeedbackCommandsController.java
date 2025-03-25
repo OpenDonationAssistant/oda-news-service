@@ -22,7 +22,11 @@ public class FeedbackCommandsController {
 
   @Post("/create")
   @Secured(SecurityRule.IS_AUTHENTICATED)
-  public void createFeedback(@PathVariable String newsId, Authentication auth, @Body CreateFeedbackCommand command) {
+  public void createFeedback(
+    @PathVariable String newsId,
+    Authentication auth,
+    @Body CreateFeedbackCommand command
+  ) {
     command.executeWith(newsId, getOwnerId(auth), feedbackRepository);
   }
 
@@ -31,5 +35,4 @@ public class FeedbackCommandsController {
       auth.getAttributes().getOrDefault("preferred_username", "")
     );
   }
-
 }

@@ -49,6 +49,11 @@ jobs:
         git remote set-url origin https://${{ secrets.PUSH_TOKEN }}@github.com/OpenDonationAssistant/oda-k3s-specs
         git push
 
+    - name: Analyze with Sonar
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=OpenDonationAssistant_oda-config-service
+
     - name: Build with Maven
       run: mvn -B package --file pom.xml -Dpackaging=native-image -DskipTests
 
