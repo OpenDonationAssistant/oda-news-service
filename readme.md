@@ -1,0 +1,7 @@
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=OpenDonationAssistant_oda-news-service&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=OpenDonationAssistant_oda-news-service)
+
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=OpenDonationAssistant_oda-news-service&metric=coverage)](https://sonarcloud.io/summary/new_code?id=OpenDonationAssistant_oda-news-service)
+
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=OpenDonationAssistant_oda-news-service&metric=bugs)](https://sonarcloud.io/summary/new_code?id=OpenDonationAssistant_oda-news-service)
+
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=OpenDonationAssistant_oda-news-service&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=OpenDonationAssistant_oda-news-service)
