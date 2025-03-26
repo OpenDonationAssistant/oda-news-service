@@ -50,7 +50,7 @@ jobs:
     - name: Analyze with Sonar
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      run: mvn -B -q verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=OpenDonationAssistant_oda-config-service
+      run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=OpenDonationAssistant_oda-config-service
 
     - name: Build service
       run: mvn -B -q package -Dpackaging=native-image -DskipTests
