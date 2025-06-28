@@ -7,26 +7,9 @@ on:
 permissions: write-all
 
 jobs:
-
-  build-and-push:
-    uses: 'OpenDonationAssistant/oda-k3s-specs/.github/workflows/build_with_npm.yml@main'
+  build-and-deploy:
+    uses: "OpenDonationAssistant/oda-k3s-specs/.github/workflows/build_and_deploy_native_with_client_package.yml@main"
     secrets: inherit
     with:
       service: news-service
-      version: '${{ github.RUN_NUMBER }}'
-
-  update-deployment-configuration:
-    uses: 'OpenDonationAssistant/oda-k3s-specs/.github/workflows/update_version.yml@main'
-    needs: build-and-push
-    secrets: inherit
-    with:
-      service: news-service
-      version: '${{ github.RUN_NUMBER }}'
-
-  deploy:
-    uses: 'OpenDonationAssistant/oda-k3s-specs/.github/workflows/deploy.yml@main'
-    needs: update-deployment-configuration
-    secrets: inherit
-    with:
-      service: news-service
-      version: '${{ github.RUN_NUMBER }}'
+      version: "${{ github.RUN_NUMBER }}"
