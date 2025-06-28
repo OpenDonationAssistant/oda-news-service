@@ -1,4 +1,4 @@
-FROM fedora:40
+FROM fedora:41
 WORKDIR /app
 COPY target/oda-news-service /app
 
