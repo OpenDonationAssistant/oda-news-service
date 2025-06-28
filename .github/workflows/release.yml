@@ -10,7 +10,6 @@ jobs:
 
   build-and-push:
     uses: 'OpenDonationAssistant/oda-k3s-specs/.github/workflows/build_with_npm.yml@main'
-    needs: build-and-push
     secrets: inherit
     with:
       service: news-service
