@@ -4,6 +4,8 @@ import io.github.opendonationassistant.news.News;
 import io.github.opendonationassistant.news.repository.NewsRepository;
 import io.micronaut.data.model.Page;
 import io.micronaut.data.model.Pageable;
+import io.micronaut.data.model.Sort;
+import io.micronaut.data.model.Sort.Order;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.security.annotation.Secured;
@@ -22,6 +24,8 @@ public class NewsController {
   @Get("/news")
   @Secured(SecurityRule.IS_ANONYMOUS)
   public @Nonnull Page<NewsDto> getNews(@Nonnull Pageable pageable) {
-    return newsRepository.list(pageable).map(News::asDto);
+    return newsRepository
+      .list(pageable.withSort(Sort.of(Order.desc("id"))))
+      .map(News::asDto);
   }
 }
