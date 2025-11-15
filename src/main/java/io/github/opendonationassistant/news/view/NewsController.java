@@ -25,7 +25,7 @@ public class NewsController {
   @Secured(SecurityRule.IS_ANONYMOUS)
   public @Nonnull Page<NewsDto> getNews(@Nonnull Pageable pageable) {
     return newsRepository
-      .list(pageable.withSort(Sort.of(Order.desc("id"))))
+      .list(pageable.withSort(Sort.of(Order.asc("id"))))
       .map(News::asDto);
   }
 }
