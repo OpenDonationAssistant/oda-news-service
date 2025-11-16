@@ -8,7 +8,6 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import java.util.Objects;
 import java.util.Optional;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,12 +32,12 @@ public class StreamerFeed {
   }
 
   public @Nonnull Optional<News> nextNews() {
-    if (lastReadNewsId == null) {
-      log.info("Streamer {} has no last read news, returning last", streamerId);
-      return news.last();
+    if (
+      Objects.equals(lastReadNewsId, news.last().map(News::getId).orElse(null))
+    ) {
+      return null;
     }
-    log.info("Streamer {} has last read news {}, returning next", streamerId, lastReadNewsId);
-    return news.nextAfter(lastReadNewsId);
+    return news.last();
   }
 
   public void markAsRead(@Nonnull String newsId) {
