@@ -35,7 +35,7 @@ public class StreamerFeed {
     if (
       Objects.equals(lastReadNewsId, news.last().map(News::getId).orElse(null))
     ) {
-      return null;
+      return Optional.empty();
     }
     return news.last();
   }
