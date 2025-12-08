@@ -12,8 +12,8 @@
   </parent>
   <properties>
     <packaging>jar</packaging>
-    <jdk.version>21</jdk.version>
-    <release.version>21</release.version>
+    <jdk.version>25</jdk.version>
+    <release.version>25</release.version>
     <micronaut.version>4.10.2</micronaut.version>
     <micronaut.test.resources.enabled>true</micronaut.test.resources.enabled>
     <micronaut.runtime>netty</micronaut.runtime>
@@ -71,11 +71,6 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>io.micronaut</groupId>
-      <artifactId>micronaut-management</artifactId>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
       <groupId>io.micronaut.data</groupId>
       <artifactId>micronaut-data-jdbc</artifactId>
       <scope>compile</scope>
@@ -121,24 +116,9 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
       <groupId>org.yaml</groupId>
       <artifactId>snakeyaml</artifactId>
       <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>io.micronaut.controlpanel</groupId>
-      <artifactId>micronaut-control-panel-management</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>io.micronaut.controlpanel</groupId>
-      <artifactId>micronaut-control-panel-ui</artifactId>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>io.micronaut.testresources</groupId>
@@ -174,12 +154,6 @@
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
-      <version>5.12.0</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-junit-jupiter</artifactId>
       <version>5.12.0</version>
       <scope>test</scope>
     </dependency>
