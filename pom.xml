@@ -78,7 +78,7 @@
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
-      <version>42.7.2</version>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>io.micronaut.flyway</groupId>
@@ -247,6 +247,16 @@
             <arg>--should-stop=ifError=FLOW</arg>
             <arg>-Xplugin:ErrorProne -XepOpt:NullAway:AnnotatedPackages=io.github.opendonationassistant -XepOpt:NullAway:JSpecifyMode=true -Xep:NullAway:ERROR</arg>
           </compilerArgs>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.graalvm.buildtools</groupId>
+        <artifactId>native-maven-plugin</artifactId>
+        <version>0.11.3</version>
+        <configuration>
+          <buildArgs>
+            <buildArg>--initialize-at-build-time=io.micronaut.context.ApplicationContextConfigurer$1</buildArg>
+          </buildArgs>
         </configuration>
       </plugin>
       <plugin>
