@@ -57,10 +57,18 @@ public class StreamerFeedTest {
     newsDataRepository.save(second);
     newsDataRepository.save(third);
     feed = feedRepository.get("streamerId");
-    final Optional<News> shouldBeSecond = feed.nextNews();
+    final Optional<News> shouldBeThird = feed.nextNews();
     assertEquals(
-      Optional.of(second.asNews(newsDataRepository)),
-      shouldBeSecond
+      Optional.of(third.asNews(newsDataRepository)),
+      shouldBeThird
+    );
+
+    feed.markAsRead("2");
+    feed = feedRepository.get("streamerId");
+    final Optional<News> shouldBeAlsoThird = feed.nextNews();
+    assertEquals(
+      Optional.of(third.asNews(newsDataRepository)),
+      shouldBeAlsoThird
     );
   }
 }

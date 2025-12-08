@@ -1,27 +1,28 @@
 package io.github.opendonationassistant.news;
 
+import org.jspecify.annotations.NonNull;
+
 import io.github.opendonationassistant.news.repository.NewsData;
 import io.github.opendonationassistant.news.repository.NewsDataRepository;
 import io.github.opendonationassistant.news.view.NewsDto;
-import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
 public class News {
 
-  private final @Nonnull String id;
-  private final @Nonnull String title;
-  private final @Nonnull String description;
-  private final @Nonnull String date;
+  private final @NonNull String id;
+  private final @NonNull String title;
+  private final @NonNull String description;
+  private final @NonNull String date;
   private final @Nullable String demoUrl;
-  private final @Nonnull NewsDataRepository repository;
+  private final @NonNull NewsDataRepository repository;
 
   public News(
-    final @Nonnull String id,
-    final @Nonnull String title,
-    final @Nonnull String description,
-    final @Nonnull String date,
+    final @NonNull String id,
+    final @NonNull String title,
+    final @NonNull String description,
+    final @NonNull String date,
     final @Nullable String demoUrl,
-    final @Nonnull NewsDataRepository repository
+    final @NonNull NewsDataRepository repository
   ) {
     this.id = id;
     this.title = title;
@@ -32,13 +33,7 @@ public class News {
   }
 
   public NewsDto asDto() {
-    final var dto = new NewsDto();
-    dto.setId(id);
-    dto.setTitle(title);
-    dto.setDescription(description);
-    dto.setDemoUrl(demoUrl);
-    dto.setDate(date);
-    return dto;
+    return new NewsDto(id, title, description, date, demoUrl);
   }
 
   public void save() {

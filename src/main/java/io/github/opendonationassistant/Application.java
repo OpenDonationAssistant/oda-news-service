@@ -13,11 +13,11 @@ import io.swagger.v3.oas.annotations.info.License;
 @OpenAPIDefinition(
   info = @Info(
     title = "ODA News Service",
-    version = "0.2",
+    version = "1.0.0",
     description = "News Service API",
     license = @License(
-      name = "GPL-3.0",
-      url = "https://www.gnu.org/licenses/gpl-3.0.en.html"
+      name = "AGPL-3.0",
+      url = "https://www.gnu.org/licenses/agpl-3.0.en.html"
     ),
     contact = @Contact(name = "stCarolas", email = "stcarolas@gmail.com")
   )

@@ -4,54 +4,54 @@ import io.github.opendonationassistant.news.News;
 import io.micronaut.data.annotation.Id;
 import io.micronaut.data.annotation.MappedEntity;
 import io.micronaut.serde.annotation.Serdeable;
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 @Serdeable
 @MappedEntity("news")
 public class NewsData {
 
   @Id
-  private @Nonnull String id;
+  private @NonNull String id;
 
-  private @Nonnull String title;
-  private @Nonnull String description;
-  private @Nonnull String date;
+  private @NonNull String title;
+  private @NonNull String description;
+  private @NonNull String date;
   private @Nullable String demoUrl;
 
-  public @Nonnull News asNews(@Nonnull NewsDataRepository repository) {
+  public @NonNull News asNews(@NonNull NewsDataRepository repository) {
     return new News(id, title, description, date, demoUrl, repository);
   }
 
-  public @Nonnull String getDate() {
+  public @NonNull String getDate() {
     return date;
   }
 
-  public void setDate(@Nonnull String date) {
+  public void setDate(@NonNull String date) {
     this.date = date;
   }
 
-  public @Nonnull String getId() {
+  public @NonNull String getId() {
     return id;
   }
 
-  public void setId(@Nonnull String id) {
+  public void setId(@NonNull String id) {
     this.id = id;
   }
 
-  public @Nonnull String getTitle() {
+  public @NonNull String getTitle() {
     return title;
   }
 
-  public void setTitle(@Nonnull String title) {
+  public void setTitle(@NonNull String title) {
     this.title = title;
   }
 
-  public @Nonnull String getDescription() {
+  public @NonNull String getDescription() {
     return description;
   }
 
-  public void setDescription(@Nonnull String description) {
+  public void setDescription(@NonNull String description) {
     this.description = description;
   }
 
@@ -64,7 +64,7 @@ public class NewsData {
   }
 
   @Override
-  public @Nonnull String toString() {
+  public @NonNull String toString() {
     return (
       "{\"_type\"=\"NewsData\",\"id\"=\"" +
       id +
@@ -79,10 +79,10 @@ public class NewsData {
   }
 
   public NewsData(
-    @Nonnull String id,
-    @Nonnull String title,
-    @Nonnull String description,
-    @Nonnull String date,
+    @NonNull String id,
+    @NonNull String title,
+    @NonNull String description,
+    @NonNull String date,
     @Nullable String demoUrl
   ) {
     this.id = id;

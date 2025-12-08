@@ -8,6 +8,8 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.util.Optional;
 
+import org.jspecify.annotations.Nullable;
+
 @Singleton
 public class NewsRepository {
 
@@ -53,7 +55,7 @@ public class NewsRepository {
     String title,
     String description,
     String date,
-    String demoUrl
+    @Nullable String demoUrl
   ) {
     var id = Generators.timeBasedEpochGenerator().generate().toString();
     NewsData newsData = new NewsData(id, title, description, date, demoUrl);

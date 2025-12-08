@@ -3,11 +3,10 @@ package io.github.opendonationassistant;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import io.github.opendonationassistant.feed.commands.MarkAsReadCommand;
-import io.github.opendonationassistant.feed.commands.StreamerFeedCommandController;
+import io.github.opendonationassistant.feed.commands.MarkAsRead;
 import io.github.opendonationassistant.feed.view.StreamerFeedController;
-import io.github.opendonationassistant.news.commands.AddNewsCommand;
-import io.github.opendonationassistant.news.commands.NewsCommandController;
+import io.github.opendonationassistant.news.commands.AddNews;
+import io.github.opendonationassistant.news.commands.AddNews.AddNewsCommand;
 import io.github.opendonationassistant.news.view.NewsDto;
 import io.micronaut.security.authentication.Authentication;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
@@ -27,10 +26,10 @@ public class LoadingFeedTest {
   StreamerFeedController controller;
 
   @Inject
-  NewsCommandController newsCommandController;
+  AddNews addNews;
 
   @Inject
-  StreamerFeedCommandController feedCommandController;
+  MarkAsRead markAsRead;
 
   @Test
   public void testGetNextNewsInFeed(
@@ -39,34 +38,33 @@ public class LoadingFeedTest {
     @Given AddNewsCommand third
   ) {
     Authentication auth = mock(Authentication.class);
-    when(auth.getAttributes())
-      .thenReturn(Map.of("preferred_username", "streamerId"));
+    when(auth.getAttributes()).thenReturn(
+      Map.of("preferred_username", "streamerId")
+    );
 
     final List<NewsDto> shouldBeEmpty = controller.getFeed(auth);
     assertTrue(shouldBeEmpty.isEmpty());
 
-    newsCommandController.createNews(first);
+    addNews.addNews(first);
     final List<NewsDto> shouldBeOne = controller.getFeed(auth);
     assertEquals(1, shouldBeOne.size());
-    assertEquals(first.getTitle(), shouldBeOne.get(0).getTitle());
-    assertEquals(first.getDescription(), shouldBeOne.get(0).getDescription());
-    assertEquals(first.getDemoUrl(), shouldBeOne.get(0).getDemoUrl());
+    assertEquals(first.title(), shouldBeOne.get(0).title());
+    assertEquals(first.description(), shouldBeOne.get(0).description());
+    assertEquals(first.demoUrl(), shouldBeOne.get(0).demoUrl());
 
-    var markAsReadCommand = new MarkAsReadCommand();
-    markAsReadCommand.setNewsId(shouldBeOne.get(0).getId());
-    feedCommandController.markAsRead(auth, markAsReadCommand);
+    var markAsReadCommand = new MarkAsRead.MarkAsReadCommand(
+      shouldBeOne.get(0).id()
+    );
+    markAsRead.markAsRead(auth, markAsReadCommand);
 
     final List<NewsDto> shouldBeEmptyAgain = controller.getFeed(auth);
     assertEquals(List.of(), shouldBeEmptyAgain);
 
-    newsCommandController.createNews(second);
+    addNews.addNews(second);
     final List<NewsDto> shouldBeSecond = controller.getFeed(auth);
     assertEquals(1, shouldBeSecond.size());
-    assertEquals(second.getTitle(), shouldBeSecond.get(0).getTitle());
-    assertEquals(
-      second.getDescription(),
-      shouldBeSecond.get(0).getDescription()
-    );
-    assertEquals(second.getDemoUrl(), shouldBeSecond.get(0).getDemoUrl());
+    assertEquals(second.title(), shouldBeSecond.get(0).title());
+    assertEquals(second.description(), shouldBeSecond.get(0).description());
+    assertEquals(second.demoUrl(), shouldBeSecond.get(0).demoUrl());
   }
 }

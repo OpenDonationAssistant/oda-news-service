@@ -2,6 +2,7 @@ package io.github.opendonationassistant.news.repository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.uuid.Generators;
@@ -12,15 +13,11 @@ import org.instancio.junit.Given;
 import org.instancio.junit.InstancioExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(InstancioExtension.class)
-@ExtendWith(MockitoExtension.class)
 public class NewsRepositoryTest {
 
-  @Mock
-  NewsDataRepository newsDataRepository;
+  NewsDataRepository newsDataRepository = mock(NewsDataRepository.class);
 
   @Test
   public void testReturningEmptyAfterLastNews(@Given NewsData last) {
