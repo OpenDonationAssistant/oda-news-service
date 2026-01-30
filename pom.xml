@@ -8,7 +8,7 @@
   <parent>
     <groupId>io.micronaut.platform</groupId>
     <artifactId>micronaut-parent</artifactId>
-    <version>4.10.2</version>
+    <version>4.10.6</version>
   </parent>
   <properties>
     <packaging>jar</packaging>
@@ -37,7 +37,7 @@
     <dependency>
       <groupId>io.github.opendonationassistant</groupId>
       <artifactId>oda-rabbit-conf</artifactId>
-      <version>0.8.110</version>
+      <version>0.9.126</version>
     </dependency>
     <dependency>
       <groupId>org.jspecify</groupId>
@@ -162,6 +162,15 @@
       <artifactId>instancio-junit</artifactId>
       <version>5.0.1</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.micronaut.micrometer</groupId>
+      <artifactId>micronaut-micrometer-registry-prometheus</artifactId>
+    </dependency>
+    <!-- Also required to enable endpoint -->
+    <dependency>
+      <groupId>io.micronaut</groupId>
+      <artifactId>micronaut-management</artifactId>
     </dependency>
   </dependencies>
   <build>
