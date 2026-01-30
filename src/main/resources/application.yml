@@ -26,3 +26,5 @@ flyway:
 endpoints:
   prometheus:
     sensitive: false
+  metrics:
+    sensitive: false
