@@ -15,12 +15,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 @ExtendWith(InstancioExtension.class)
-public class NewsRepositoryTest {
+class NewsRepositoryTest {
 
   NewsDataRepository newsDataRepository = mock(NewsDataRepository.class);
 
   @Test
-  public void testReturningEmptyAfterLastNews(@Given NewsData last) {
+  void testReturningEmptyAfterLastNews(@Given NewsData last) {
     when(newsDataRepository.findAll()).thenReturn(List.of(last));
     Optional<News> actual = new NewsRepository(newsDataRepository)
       .nextAfter(last.getId());
@@ -28,7 +28,7 @@ public class NewsRepositoryTest {
   }
 
   @Test
-  public void testReturningLastNews(
+  void testReturningLastNews(
     @Given NewsData first,
     @Given NewsData second
   ) throws InterruptedException {
@@ -42,7 +42,7 @@ public class NewsRepositoryTest {
   }
 
   @Test
-  public void testReturningNextNews(
+  void testReturningNextNews(
     @Given NewsData first,
     @Given NewsData second,
     @Given NewsData third

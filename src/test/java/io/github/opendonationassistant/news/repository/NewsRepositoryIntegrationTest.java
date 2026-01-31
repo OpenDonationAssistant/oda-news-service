@@ -8,13 +8,13 @@ import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 
 @MicronautTest(environments = "allinone")
-public class NewsRepositoryIntegrationTest {
+class NewsRepositoryIntegrationTest {
 
   @Inject
   NewsDataRepository dataRepository;
 
   @Test
-  public void testSavingAndReadingNews() {
+  void testSavingAndReadingNews() {
     var repository = new NewsRepository(dataRepository);
 
     var created = repository.create(
