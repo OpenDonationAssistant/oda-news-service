@@ -30,7 +30,7 @@ public class NewsRepository {
     return newsDataRepository
       .findAll()
       .stream()
-      .sorted((o1, o2) -> -o1.getId().compareTo(o2.getId()))
+      .sorted((o1, o2) -> o2.getId().compareTo(o1.getId()))
       .findFirst()
       .map(data -> data.asNews(newsDataRepository));
   }

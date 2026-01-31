@@ -167,7 +167,6 @@
       <groupId>io.micronaut.micrometer</groupId>
       <artifactId>micronaut-micrometer-registry-prometheus</artifactId>
     </dependency>
-    <!-- Also required to enable endpoint -->
     <dependency>
       <groupId>io.micronaut</groupId>
       <artifactId>micronaut-management</artifactId>
