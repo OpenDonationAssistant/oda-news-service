@@ -1,6 +1,7 @@
 # ODA News Service
 
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/OpenDonationAssistant/oda-news-service)
+[![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=OpenDonationAssistant_oda-news-service)](https://sonarcloud.io/summary/new_code?id=OpenDonationAssistant_oda-news-service)
 
 ## Running with Docker
 
