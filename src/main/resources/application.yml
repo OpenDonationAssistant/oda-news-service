@@ -23,6 +23,8 @@ flyway:
   datasources:
     default:
       enabled: true
+      schemas: 'news'
+      default-schema: 'news'
 endpoints:
   prometheus:
     sensitive: false
