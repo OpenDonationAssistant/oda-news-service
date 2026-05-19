@@ -18,6 +18,7 @@ public class NewsData {
   private @NonNull String description;
   private @NonNull String date;
   private @Nullable String demoUrl;
+  private boolean global = true;
 
   public @NonNull News asNews(@NonNull NewsDataRepository repository) {
     return new News(id, title, description, date, demoUrl, repository);
@@ -63,6 +64,14 @@ public class NewsData {
     this.demoUrl = demoUrl;
   }
 
+  public boolean isGlobal() {
+    return global;
+  }
+
+  public void setGlobal(boolean global) {
+    this.global = global;
+  }
+
   @Override
   public @NonNull String toString() {
     return (
@@ -74,6 +83,8 @@ public class NewsData {
       description +
       "\", demoUrl\"=\"" +
       demoUrl +
+      "\", global\"=\"" +
+      global +
       "}"
     );
   }
@@ -90,5 +101,22 @@ public class NewsData {
     this.description = description;
     this.date = date;
     this.demoUrl = demoUrl;
+    this.global = true;
+  }
+
+  public NewsData(
+    @NonNull String id,
+    @NonNull String title,
+    @NonNull String description,
+    @NonNull String date,
+    @Nullable String demoUrl,
+    boolean global
+  ) {
+    this.id = id;
+    this.title = title;
+    this.description = description;
+    this.date = date;
+    this.demoUrl = demoUrl;
+    this.global = global;
   }
 }
