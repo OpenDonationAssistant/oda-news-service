@@ -9,13 +9,16 @@ import io.github.opendonationassistant.news.view.NewsController;
 import io.github.opendonationassistant.news.view.NewsDto;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.data.model.Pageable;
+import io.micronaut.security.authentication.Authentication;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
 import java.util.List;
+import java.util.Map;
 import org.instancio.junit.Given;
 import org.instancio.junit.InstancioExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 
 @MicronautTest(environments = "allinone")
 @ExtendWith(InstancioExtension.class)
@@ -29,7 +32,11 @@ public class CreateAndReadNewsTest {
 
   @Test
   public void testCreateAndReadNews(@Given AddNewsCommand command) {
-    addNews.addNews(command);
+    Authentication auth = Mockito.mock(Authentication.class);
+    Mockito.when(auth.getAttributes()).thenReturn(
+      Map.of("preferred_username", "testuser")
+    );
+    addNews.addNews(auth, command);
 
     @NonNull
     final List<NewsDto> news = newsController

@@ -6,6 +6,7 @@ import io.micronaut.data.model.Page;
 import io.micronaut.data.model.Pageable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import java.time.Instant;
 import java.util.Optional;
 
 import org.jspecify.annotations.Nullable;
@@ -54,11 +55,21 @@ public class NewsRepository {
   public News create(
     String title,
     String description,
+    @Nullable String demoUrl,
+    boolean global
+  ) {
+    return create(title, description, Instant.now().toString(), demoUrl, global);
+  }
+
+  public News create(
+    String title,
+    String description,
     String date,
-    @Nullable String demoUrl
+    @Nullable String demoUrl,
+    boolean global
   ) {
     var id = Generators.timeBasedEpochGenerator().generate().toString();
-    NewsData newsData = new NewsData(id, title, description, date, demoUrl);
+    NewsData newsData = new NewsData(id, title, description, date, demoUrl, global);
     newsDataRepository.save(newsData);
     return newsData.asNews(newsDataRepository);
   }

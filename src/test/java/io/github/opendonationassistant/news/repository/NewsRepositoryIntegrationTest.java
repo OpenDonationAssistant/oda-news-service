@@ -21,7 +21,8 @@ class NewsRepositoryIntegrationTest {
       "First News",
       "Description",
       "2024-01-01",
-      "https://demo.url"
+      "https://demo.url",
+      true
     );
     assertNotNull(created);
     assertNotNull(created.getId());

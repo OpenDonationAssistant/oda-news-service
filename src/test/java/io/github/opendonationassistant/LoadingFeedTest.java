@@ -39,13 +39,13 @@ public class LoadingFeedTest {
   ) {
     Authentication auth = mock(Authentication.class);
     when(auth.getAttributes()).thenReturn(
-      Map.of("preferred_username", "streamerId")
+      Map.of("preferred_username", "testuser")
     );
 
     final List<NewsDto> shouldBeEmpty = controller.getFeed(auth);
     assertTrue(shouldBeEmpty.isEmpty());
 
-    addNews.addNews(first);
+    addNews.addNews(auth, first);
     final List<NewsDto> shouldBeOne = controller.getFeed(auth);
     assertEquals(1, shouldBeOne.size());
     assertEquals(first.title(), shouldBeOne.get(0).title());
@@ -60,7 +60,7 @@ public class LoadingFeedTest {
     final List<NewsDto> shouldBeEmptyAgain = controller.getFeed(auth);
     assertEquals(List.of(), shouldBeEmptyAgain);
 
-    addNews.addNews(second);
+    addNews.addNews(auth, second);
     final List<NewsDto> shouldBeSecond = controller.getFeed(auth);
     assertEquals(1, shouldBeSecond.size());
     assertEquals(second.title(), shouldBeSecond.get(0).title());
