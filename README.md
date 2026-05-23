@@ -1,7 +1,9 @@
 # ODA News Service
-
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/OpenDonationAssistant/oda-news-service)
-[![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=OpenDonationAssistant_oda-news-service)](https://sonarcloud.io/summary/new_code?id=OpenDonationAssistant_oda-news-service)
+![Sonar Tech Debt](https://img.shields.io/sonar/tech_debt/OpenDonationAssistant_oda-news-service?server=https%3A%2F%2Fsonarcloud.io)
+![Sonar Violations](https://img.shields.io/sonar/violations/OpenDonationAssistant_oda-news-service?server=https%3A%2F%2Fsonarcloud.io)
+![Sonar Tests](https://img.shields.io/sonar/tests/OpenDonationAssistant_oda-news-service?server=https%3A%2F%2Fsonarcloud.io)
+![Sonar Coverage](https://img.shields.io/sonar/coverage/OpenDonationAssistant_oda-news-service?server=https%3A%2F%2Fsonarcloud.io)
 
 ## Running with Docker
 
