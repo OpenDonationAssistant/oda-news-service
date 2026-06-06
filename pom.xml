@@ -22,7 +22,7 @@
     <exec.mainClass>io.github.opendonationassistant.Application</exec.mainClass>
     <sonar.organization>opendonationassistant</sonar.organization>
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-    <sonar.projectKey>opendonationassistant_oda-news-service</sonar.projectKey>
+    <sonar.projectKey>OpenDonationAssistant_oda-news-service</sonar.projectKey>
     <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
     <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
     <sonar.jacoco.reportPath>${project.basedir}/target/jacoco.exec</sonar.jacoco.reportPath>
