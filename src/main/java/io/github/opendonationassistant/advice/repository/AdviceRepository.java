@@ -4,6 +4,7 @@ import com.fasterxml.uuid.Generators;
 import io.github.opendonationassistant.advice.Advice;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import java.util.Optional;
 
 @Singleton
 public class AdviceRepository {
@@ -20,5 +21,11 @@ public class AdviceRepository {
     AdviceData data = new AdviceData(id, text);
     adviceDataRepository.save(data);
     return data.asAdvice(adviceDataRepository);
+  }
+
+  public Optional<Advice> getRandom() {
+    return adviceDataRepository
+      .findRandom()
+      .map(data -> data.asAdvice(adviceDataRepository));
   }
 }
