@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.github.opendonationassistant</groupId>
   <artifactId>oda-news-service</artifactId>
-  <version>0.3.0</version>
+  <version>0.4.0</version>
   <packaging>${packaging}</packaging>
 
   <parent>
@@ -40,7 +40,7 @@
     <dependency>
       <groupId>io.github.opendonationassistant</groupId>
       <artifactId>oda-rabbit-conf</artifactId>
-      <version>0.10.211</version>
+      <version>0.11.228</version>
     </dependency>
     <dependency>
       <groupId>org.jspecify</groupId>
