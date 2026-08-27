@@ -1,16 +1,20 @@
 package io.github.opendonationassistant;
 
+import io.github.opendonationassistant.rabbit.RabbitClient;
 import io.micronaut.context.ApplicationContextBuilder;
 import io.micronaut.context.ApplicationContextConfigurer;
 import io.micronaut.context.annotation.ContextConfigurer;
 import io.micronaut.context.annotation.Factory;
 import io.micronaut.context.annotation.Value;
 import io.micronaut.core.annotation.NonNull;
+import io.micronaut.rabbitmq.connect.ChannelPool;
 import io.micronaut.runtime.Micronaut;
+import io.micronaut.serde.ObjectMapper;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Contact;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.info.License;
+import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import org.infinispan.client.hotrod.RemoteCacheManager;
 import org.infinispan.client.hotrod.configuration.ConfigurationBuilder;
@@ -44,6 +48,12 @@ public class Application {
 
   public static void main(String[] args) {
     Micronaut.build(args).banner(false).classes(Application.class).start();
+  }
+
+  @Singleton
+  @Named("events")
+  public RabbitClient eventsFacade(ChannelPool pool, ObjectMapper mapper) {
+    return new RabbitClient(pool, mapper, "notifications");
   }
 
   @Singleton

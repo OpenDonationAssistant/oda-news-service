@@ -2,6 +2,8 @@ package io.github.opendonationassistant.warning.commands;
 
 import io.github.opendonationassistant.commons.logging.ODALogger;
 import io.github.opendonationassistant.commons.micronaut.BaseController;
+import io.github.opendonationassistant.events.HasRecipientId;
+import io.github.opendonationassistant.rabbit.RabbitClient;
 import io.github.opendonationassistant.warning.repository.WarningData;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.Body;
@@ -12,6 +14,7 @@ import io.micronaut.security.authentication.Authentication;
 import io.micronaut.security.rules.SecurityRule;
 import io.micronaut.serde.annotation.Serdeable;
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -22,10 +25,15 @@ public class WarningCommandsController extends BaseController {
 
   private final ODALogger log = new ODALogger(WarningCommandsController.class);
   private final Map<String, List<WarningData>> warnings;
+  private final RabbitClient eventsFacade;
 
   @Inject
-  public WarningCommandsController(Map<String, List<WarningData>> warnings) {
+  public WarningCommandsController(
+    Map<String, List<WarningData>> warnings,
+    @Named("events") RabbitClient eventsFacade
+  ) {
     this.warnings = warnings;
+    this.eventsFacade = eventsFacade;
   }
 
   @Post("/warnings/commands/clear")
@@ -64,9 +72,20 @@ public class WarningCommandsController extends BaseController {
       );
       list.add(new WarningData(command.message()));
       warnings.put(recipientId.get(), list);
+      try {
+        eventsFacade.sendEvent(
+          new AddedWarningEvent(recipientId.get(), command.message())
+        );
+      } catch (Exception e) {
+        log.error("Failed to send AddedWarningEvent", e);
+      }
       return HttpResponse.ok();
     });
   }
+
+  @Serdeable
+  public static record AddedWarningEvent(String recipientId, String message)
+    implements HasRecipientId {}
 
   @Serdeable
   public static record AddWarningCommand(String message) {}
