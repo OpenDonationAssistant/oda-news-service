@@ -64,7 +64,7 @@ public class WarningCommandsController extends BaseController {
     }
     log.info(
       "Adding warning",
-      Map.of("recipientId", recipientId, "message", command.message())
+      Map.of("recipientId", recipientId.get(), "message", command.message())
     );
     return CompletableFuture.supplyAsync(() -> {
       var list = new ArrayList<>(
