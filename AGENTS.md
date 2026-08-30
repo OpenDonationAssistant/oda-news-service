@@ -9,6 +9,7 @@ Micronaut 5 (Java 25) news/feed service for the OpenDonationAssistant platform. 
 - `mvn compile` — runs annotation processors; **ErrorProne and NullAway (`NullAway:ERROR`) are build-failing**, not advisory. Compilation fails on null-safety violations.
 - `mvn test` — JUnit 5, spins up PostgreSQL via Micronaut Test Resources (`micronaut.test.resources.enabled=true`). **Requires Docker** (or a reachable Postgres) for the `allinone` tests.
 - Single test: `mvn test -Dtest=CreateAndReadNewsTest`
+- Tests use `@MicronautTest(environments = "allinone")` + Instancio `@Given` for random fixtures; `Authentication` is mocked via Mockito (`preferred_username` attribute) — no real JWT is minted.
 - `mvn package` — jar + JaCoCo report. `packaging` is parameterized as `${packaging}` (default `jar`); the release pipeline switches it to produce a GraalVM native binary at `target/oda-news-service`, which the `Dockerfile` copies.
 
 ## Config & environments
@@ -16,13 +17,13 @@ Micronaut 5 (Java 25) news/feed service for the OpenDonationAssistant platform. 
 - Default environment is **`standalone`** (set in `Application.Configurer`); tests override it with **`allinone`** (`@MicronautTest(environments = "allinone")`).
 - `application-standalone.yml` reads `JDBC_URL`, `JDBC_USER`, `JDBC_PASSWORD` (defaults `jdbc:postgresql://localhost/postgres` / `postgres` / `postgres`).
 - `JWKS_URI` is required with **no default** — the Keycloak JWKS URL for JWT signature verification.
-- `Application.java` also declares an Infinispan `RemoteCacheManager` bean bound to `infinispan.client.hotrod.*` properties (no defaults in repo); the warning cache actually uses the embedded `EmbeddedCacheManager`.
+- `Application.java` also declares an Infinispan `RemoteCacheManager` bean bound to `infinispan.client.hotrod.*` properties (no defaults in repo), but **nothing injects it** — the warning cache uses the embedded `EmbeddedCacheManager` instead, so those hotrod props aren't actually required to run.
 
 ## Architecture (non-obvious)
 
 Each domain module (`news`, `advice`, `feed`, `feedback`, `warning`) follows the same layered layout under `io.github.opendonationassistant`:
 
-- `{module}/Xxx.java` — domain entity holding its own `DataRepository` ref, exposes `asDto()` and `save()`.
+- `{module}/Xxx.java` — domain entity, typically holding its own `DataRepository` ref and exposing `asDto()`/`save()` (`News`, `Advice`). Simpler modules deviate: `NewsFeedback` is a plain POJO (its `Data` class exposes `asNewsFeedback()`), and `StreamerFeed` exposes `nextNews()`/`markAsRead()` instead.
 - `{module}/view/` — read/query `@Controller`s returning `@Serdeable` DTO records.
 - `{module}/commands/` — command endpoints (`@Controller` + `@Post("/.../commands/...")`), often nested `record` command bodies marked `@Serdeable`.
 - `{module}/repository/` — three files:
@@ -36,6 +37,7 @@ Key patterns:
 - **Shared libs**: `BaseController` and `ODALogger` come from `io.github.opendonationassistant:oda-commons`, pulled transitively via `oda-rabbit-conf`. The ODA libs version is pinned by `<oda.version>` (`0.11.232`).
 - **Flyway** migrations live in `src/main/resources/db/migration/`, schema `news`; add new ones as sequential `V{n}__*.sql`.
 - **Logging**: use `ODALogger` with structured `Map.of("key", value, ...)` context rather than string interpolation. `logback.xml` emits JSON lines.
+- **Events**: `Application.eventsFacade` exposes a `@Named("events") RabbitClient` that publishes to the `"notifications"` routing key (3rd constructor arg). Only `WarningCommandsController` uses it today, sending `AddedWarningEvent` (which implements `HasRecipientId`).
 
 ## Style & correctness
 

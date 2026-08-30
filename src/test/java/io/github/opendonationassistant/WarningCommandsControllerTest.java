@@ -95,4 +95,35 @@ public class WarningCommandsControllerTest {
     assertEquals(HttpStatus.OK, response.join().getStatus());
     assertEquals(2, warnings.get("streamerId").size());
   }
+
+  @Test
+  public void testCreateWarningWithComponent() {
+    var command = new WarningCommandsController.AddWarningCommand(
+      "you have been warned",
+      "chat"
+    );
+
+    var response = controller.addWarning(auth("streamerWithComponent"), command);
+
+    assertEquals(HttpStatus.OK, response.join().getStatus());
+    assertEquals(
+      List.of(new WarningData("you have been warned", "chat")),
+      warnings.get("streamerWithComponent")
+    );
+  }
+
+  @Test
+  public void testCreateWarningWithoutComponentDefaultsToNull() {
+    var command = new WarningCommandsController.AddWarningCommand(
+      "you have been warned"
+    );
+
+    var response = controller.addWarning(auth("streamerNoComponent"), command);
+
+    assertEquals(HttpStatus.OK, response.join().getStatus());
+    assertEquals(
+      List.of(new WarningData("you have been warned", null)),
+      warnings.get("streamerNoComponent")
+    );
+  }
 }

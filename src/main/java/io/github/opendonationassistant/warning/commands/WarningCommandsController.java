@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import org.jspecify.annotations.Nullable;
 
 @Controller
 public class WarningCommandsController extends BaseController {
@@ -70,7 +71,7 @@ public class WarningCommandsController extends BaseController {
       var list = new ArrayList<>(
         warnings.getOrDefault(recipientId.get(), new ArrayList<>())
       );
-      list.add(new WarningData(command.message()));
+      list.add(new WarningData(command.message(), command.component()));
       warnings.put(recipientId.get(), list);
       try {
         eventsFacade.sendEvent(
@@ -88,5 +89,12 @@ public class WarningCommandsController extends BaseController {
     implements HasRecipientId {}
 
   @Serdeable
-  public static record AddWarningCommand(String message) {}
+  public static record AddWarningCommand(
+    String message,
+    @Nullable String component
+  ) {
+    public AddWarningCommand(String message) {
+      this(message, null);
+    }
+  }
 }
