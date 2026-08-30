@@ -35,7 +35,8 @@ public class WarningCommandsControllerTest {
   public void testClearWarningsForRecipient() {
     warnings.put("streamerId", List.of(new WarningData("warning message")));
 
-    var response = controller.clearWarnings(auth("streamerId"));
+    var command = new WarningCommandsController.ClearWarningsCommand(null);
+    var response = controller.clearWarnings(auth("streamerId"), command);
 
     assertEquals(HttpStatus.OK, response.join().getStatus());
     assertTrue(
@@ -48,7 +49,8 @@ public class WarningCommandsControllerTest {
     warnings.put("streamerA", List.of(new WarningData("mine")));
     warnings.put("streamerB", List.of(new WarningData("theirs")));
 
-    var response = controller.clearWarnings(auth("streamerA"));
+    var command = new WarningCommandsController.ClearWarningsCommand(null);
+    var response = controller.clearWarnings(auth("streamerA"), command);
 
     assertEquals(HttpStatus.OK, response.join().getStatus());
     assertTrue(warnings.get("streamerA") == null);
@@ -60,9 +62,62 @@ public class WarningCommandsControllerTest {
     Authentication auth = mock(Authentication.class);
     when(auth.getAttributes()).thenReturn(Map.of());
 
-    var response = controller.clearWarnings(auth);
+    var command = new WarningCommandsController.ClearWarningsCommand(null);
+    var response = controller.clearWarnings(auth, command);
 
     assertEquals(HttpStatus.UNAUTHORIZED, response.join().getStatus());
+  }
+
+  @Test
+  public void testClearWarningsByComponents() {
+    warnings.put(
+      "streamerByComponents",
+      new java.util.ArrayList<>(
+        List.of(
+          new WarningData("chat warning", "chat"),
+          new WarningData("donation warning", "donation"),
+          new WarningData("no component")
+        )
+      )
+    );
+
+    var command = new WarningCommandsController.ClearWarningsCommand(
+      List.of("chat")
+    );
+    var response = controller.clearWarnings(auth("streamerByComponents"), command);
+
+    assertEquals(HttpStatus.OK, response.join().getStatus());
+    assertEquals(
+      List.of(
+        new WarningData("donation warning", "donation"),
+        new WarningData("no component")
+      ),
+      warnings.get("streamerByComponents")
+    );
+  }
+
+  @Test
+  public void testClearWarningsWithEmptyComponentsDeletesNothing() {
+    warnings.put(
+      "streamerEmptyComponents",
+      new java.util.ArrayList<>(
+        List.of(new WarningData("chat warning", "chat"))
+      )
+    );
+
+    var command = new WarningCommandsController.ClearWarningsCommand(
+      List.of()
+    );
+    var response = controller.clearWarnings(
+      auth("streamerEmptyComponents"),
+      command
+    );
+
+    assertEquals(HttpStatus.OK, response.join().getStatus());
+    assertEquals(
+      List.of(new WarningData("chat warning", "chat")),
+      warnings.get("streamerEmptyComponents")
+    );
   }
 
   @Test

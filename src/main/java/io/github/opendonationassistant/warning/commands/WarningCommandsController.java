@@ -40,7 +40,8 @@ public class WarningCommandsController extends BaseController {
   @Post("/warnings/commands/clear")
   @Secured(SecurityRule.IS_AUTHENTICATED)
   public CompletableFuture<HttpResponse<Void>> clearWarnings(
-    Authentication auth
+    Authentication auth,
+    @Body ClearWarningsCommand command
   ) {
     var ownerId = getOwnerId(auth);
     if (ownerId.isEmpty()) {
@@ -48,7 +49,20 @@ public class WarningCommandsController extends BaseController {
     }
     log.info("Clearing warnings", Map.of("recipientId", ownerId.get()));
     return CompletableFuture.supplyAsync(() -> {
-      warnings.remove(ownerId.get());
+      var components = command.components();
+      if (components == null) {
+        warnings.remove(ownerId.get());
+      } else {
+        var list = new ArrayList<>(
+          warnings.getOrDefault(ownerId.get(), new ArrayList<>())
+        );
+        list.removeIf(
+          warning ->
+            warning.component() != null &&
+            components.contains(warning.component())
+        );
+        warnings.put(ownerId.get(), list);
+      }
       return HttpResponse.ok();
     });
   }
@@ -97,4 +111,9 @@ public class WarningCommandsController extends BaseController {
       this(message, null);
     }
   }
+
+  @Serdeable
+  public static record ClearWarningsCommand(
+    @Nullable List<String> components
+  ) {}
 }
