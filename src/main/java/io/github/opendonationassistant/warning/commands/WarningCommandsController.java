@@ -47,7 +47,10 @@ public class WarningCommandsController extends BaseController {
     if (ownerId.isEmpty()) {
       return CompletableFuture.completedFuture(HttpResponse.unauthorized());
     }
-    log.info("Clearing warnings", Map.of("recipientId", ownerId.get()));
+    log.info(
+      "Clearing warnings",
+      Map.of("recipientId", ownerId.get(), "components", command.components())
+    );
     return CompletableFuture.supplyAsync(() -> {
       var components = command.components();
       if (components == null) {
