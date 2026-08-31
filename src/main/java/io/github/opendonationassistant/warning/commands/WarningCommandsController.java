@@ -18,6 +18,7 @@ import jakarta.inject.Named;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import org.jspecify.annotations.Nullable;
 
@@ -49,7 +50,12 @@ public class WarningCommandsController extends BaseController {
     }
     log.info(
       "Clearing warnings",
-      Map.of("recipientId", ownerId.get(), "components", command.components())
+      Map.of(
+        "recipientId",
+        ownerId.get(),
+        "components",
+        Optional.ofNullable(command.components()).orElse(List.of())
+      )
     );
     return CompletableFuture.supplyAsync(() -> {
       var components = command.components();
