@@ -94,7 +94,23 @@ public class WarningCommandsController extends BaseController {
       var list = new ArrayList<>(
         warnings.getOrDefault(recipientId.get(), new ArrayList<>())
       );
-      list.add(new WarningData(command.message(), command.component()));
+      var newWarning = new WarningData(command.message(), command.component());
+      var component = command.component();
+      if (component != null) {
+        var replaced = false;
+        for (int i = 0; i < list.size(); i++) {
+          if (component.equals(list.get(i).component())) {
+            list.set(i, newWarning);
+            replaced = true;
+            break;
+          }
+        }
+        if (!replaced) {
+          list.add(newWarning);
+        }
+      } else {
+        list.add(newWarning);
+      }
       warnings.put(recipientId.get(), list);
       try {
         eventsFacade.sendEvent(

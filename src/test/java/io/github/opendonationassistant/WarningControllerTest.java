@@ -31,12 +31,37 @@ public class WarningControllerTest {
 
   @Test
   public void testGetWarningsForRecipient() {
-    var expected = List.of(new WarningData("warning message"));
+    var oldTimestamp = System.currentTimeMillis() - 200_000;
+    var expected = List.of(
+      new WarningData("warning message", null, oldTimestamp)
+    );
     warnings.put("streamerId", expected);
 
     var result = controller.getWarnings(auth("streamerId"));
 
     assertEquals(expected, result.join().body());
+  }
+
+  @Test
+  public void testGetWarningsFiltersRecentWarnings() {
+    var recentTimestamp = System.currentTimeMillis();
+    var oldTimestamp = System.currentTimeMillis() - 200_000;
+    warnings.put(
+      "streamerFilter",
+      new java.util.ArrayList<>(
+        List.of(
+          new WarningData("recent", null, recentTimestamp),
+          new WarningData("old", null, oldTimestamp)
+        )
+      )
+    );
+
+    var result = controller.getWarnings(auth("streamerFilter"));
+
+    assertEquals(
+      List.of(new WarningData("old", null, oldTimestamp)),
+      result.join().body()
+    );
   }
 
   @Test

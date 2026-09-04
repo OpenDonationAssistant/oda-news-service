@@ -35,8 +35,14 @@ public class WarningController extends BaseController {
       return CompletableFuture.completedFuture(HttpResponse.unauthorized());
     }
     log.debug("Getting warnings", Map.of("recipientId", recipientId));
-    return CompletableFuture.supplyAsync(() ->
-      HttpResponse.ok(warnings.getOrDefault(recipientId.get(), List.of()))
-    );
+    return CompletableFuture.supplyAsync(() -> {
+      var now = System.currentTimeMillis();
+      var all = warnings.getOrDefault(recipientId.get(), List.of());
+      var filtered = all
+        .stream()
+        .filter(w -> now - w.timestamp() > 180_000)
+        .toList();
+      return HttpResponse.ok(filtered);
+    });
   }
 }

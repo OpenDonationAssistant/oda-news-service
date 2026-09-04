@@ -31,9 +31,17 @@ public class WarningCommandsControllerTest {
     return auth;
   }
 
+  private static WarningData warning(String message) {
+    return new WarningData(message, null, 1000L);
+  }
+
+  private static WarningData warning(String message, String component) {
+    return new WarningData(message, component, 1000L);
+  }
+
   @Test
   public void testClearWarningsForRecipient() {
-    warnings.put("streamerId", List.of(new WarningData("warning message")));
+    warnings.put("streamerId", List.of(warning("warning message")));
 
     var command = new WarningCommandsController.ClearWarningsCommand(null);
     var response = controller.clearWarnings(auth("streamerId"), command);
@@ -46,8 +54,8 @@ public class WarningCommandsControllerTest {
 
   @Test
   public void testClearWarningsDoesNotAffectOtherRecipients() {
-    warnings.put("streamerA", List.of(new WarningData("mine")));
-    warnings.put("streamerB", List.of(new WarningData("theirs")));
+    warnings.put("streamerA", List.of(warning("mine")));
+    warnings.put("streamerB", List.of(warning("theirs")));
 
     var command = new WarningCommandsController.ClearWarningsCommand(null);
     var response = controller.clearWarnings(auth("streamerA"), command);
@@ -74,9 +82,9 @@ public class WarningCommandsControllerTest {
       "streamerByComponents",
       new java.util.ArrayList<>(
         List.of(
-          new WarningData("chat warning", "chat"),
-          new WarningData("donation warning", "donation"),
-          new WarningData("no component")
+          warning("chat warning", "chat"),
+          warning("donation warning", "donation"),
+          warning("no component")
         )
       )
     );
@@ -89,8 +97,8 @@ public class WarningCommandsControllerTest {
     assertEquals(HttpStatus.OK, response.join().getStatus());
     assertEquals(
       List.of(
-        new WarningData("donation warning", "donation"),
-        new WarningData("no component")
+        warning("donation warning", "donation"),
+        warning("no component")
       ),
       warnings.get("streamerByComponents")
     );
@@ -101,7 +109,7 @@ public class WarningCommandsControllerTest {
     warnings.put(
       "streamerEmptyComponents",
       new java.util.ArrayList<>(
-        List.of(new WarningData("chat warning", "chat"))
+        List.of(warning("chat warning", "chat"))
       )
     );
 
@@ -115,7 +123,7 @@ public class WarningCommandsControllerTest {
 
     assertEquals(HttpStatus.OK, response.join().getStatus());
     assertEquals(
-      List.of(new WarningData("chat warning", "chat")),
+      List.of(warning("chat warning", "chat")),
       warnings.get("streamerEmptyComponents")
     );
   }
@@ -129,17 +137,16 @@ public class WarningCommandsControllerTest {
     var response = controller.addWarning(auth("streamerId"), command);
 
     assertEquals(HttpStatus.OK, response.join().getStatus());
-    assertEquals(
-      List.of(new WarningData("you have been warned")),
-      warnings.get("streamerId")
-    );
+    assertEquals(1, warnings.get("streamerId").size());
+    assertEquals("you have been warned", warnings.get("streamerId").get(0).message());
+    assertEquals(null, warnings.get("streamerId").get(0).component());
   }
 
   @Test
   public void testCreateWarningAppendsToExistingWarnings() {
     warnings.put(
       "streamerId",
-      new java.util.ArrayList<>(List.of(new WarningData("first")))
+      new java.util.ArrayList<>(List.of(warning("first")))
     );
     var command = new WarningCommandsController.AddWarningCommand(
       "second warning"
@@ -161,10 +168,54 @@ public class WarningCommandsControllerTest {
     var response = controller.addWarning(auth("streamerWithComponent"), command);
 
     assertEquals(HttpStatus.OK, response.join().getStatus());
-    assertEquals(
-      List.of(new WarningData("you have been warned", "chat")),
-      warnings.get("streamerWithComponent")
+    assertEquals(1, warnings.get("streamerWithComponent").size());
+    assertEquals("you have been warned", warnings.get("streamerWithComponent").get(0).message());
+    assertEquals("chat", warnings.get("streamerWithComponent").get(0).component());
+  }
+
+  @Test
+  public void testAddWarningOverridesExistingWithSameComponent() {
+    warnings.put(
+      "streamerOverride",
+      new java.util.ArrayList<>(
+        List.of(
+          warning("old chat warning", "chat"),
+          warning("donation warning", "donation")
+        )
+      )
     );
+    var command = new WarningCommandsController.AddWarningCommand(
+      "new chat warning",
+      "chat"
+    );
+
+    var response = controller.addWarning(
+      auth("streamerOverride"),
+      command
+    );
+
+    assertEquals(HttpStatus.OK, response.join().getStatus());
+    assertEquals(2, warnings.get("streamerOverride").size());
+    assertEquals("new chat warning", warnings.get("streamerOverride").get(0).message());
+    assertEquals("chat", warnings.get("streamerOverride").get(0).component());
+    assertEquals("donation warning", warnings.get("streamerOverride").get(1).message());
+    assertEquals("donation", warnings.get("streamerOverride").get(1).component());
+  }
+
+  @Test
+  public void testAddWarningWithoutComponentAlwaysAppends() {
+    warnings.put(
+      "streamerNoComp",
+      new java.util.ArrayList<>(
+        List.of(warning("first"))
+      )
+    );
+    var command = new WarningCommandsController.AddWarningCommand("second");
+
+    var response = controller.addWarning(auth("streamerNoComp"), command);
+
+    assertEquals(HttpStatus.OK, response.join().getStatus());
+    assertEquals(2, warnings.get("streamerNoComp").size());
   }
 
   @Test
@@ -176,9 +227,8 @@ public class WarningCommandsControllerTest {
     var response = controller.addWarning(auth("streamerNoComponent"), command);
 
     assertEquals(HttpStatus.OK, response.join().getStatus());
-    assertEquals(
-      List.of(new WarningData("you have been warned", null)),
-      warnings.get("streamerNoComponent")
-    );
+    assertEquals(1, warnings.get("streamerNoComponent").size());
+    assertEquals("you have been warned", warnings.get("streamerNoComponent").get(0).message());
+    assertEquals(null, warnings.get("streamerNoComponent").get(0).component());
   }
 }
