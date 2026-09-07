@@ -7,8 +7,13 @@ import org.jspecify.annotations.Nullable;
 public record WarningData(
   String message,
   @Nullable String component,
-  long timestamp
+  long timestamp,
+  String priority
 ) {
+  public WarningData(String message, @Nullable String component, long timestamp) {
+    this(message, component, timestamp, "Notification");
+  }
+
   public WarningData(String message, @Nullable String component) {
     this(message, component, System.currentTimeMillis());
   }

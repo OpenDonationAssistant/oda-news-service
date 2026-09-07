@@ -94,7 +94,12 @@ public class WarningCommandsController extends BaseController {
       var list = new ArrayList<>(
         warnings.getOrDefault(recipientId.get(), new ArrayList<>())
       );
-      var newWarning = new WarningData(command.message(), command.component());
+      var newWarning = new WarningData(
+        command.message(),
+        command.component(),
+        System.currentTimeMillis(),
+        command.priority() == null ? "Notification" : command.priority()
+      );
       var component = command.component();
       if (component != null) {
         var replaced = false;
@@ -130,10 +135,15 @@ public class WarningCommandsController extends BaseController {
   @Serdeable
   public static record AddWarningCommand(
     String message,
-    @Nullable String component
+    @Nullable String component,
+    @Nullable String priority
   ) {
     public AddWarningCommand(String message) {
-      this(message, null);
+      this(message, null, null);
+    }
+
+    public AddWarningCommand(String message, @Nullable String component) {
+      this(message, component, null);
     }
   }
 

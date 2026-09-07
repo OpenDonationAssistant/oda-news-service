@@ -140,6 +140,7 @@ public class WarningCommandsControllerTest {
     assertEquals(1, warnings.get("streamerId").size());
     assertEquals("you have been warned", warnings.get("streamerId").get(0).message());
     assertEquals(null, warnings.get("streamerId").get(0).component());
+    assertEquals("Notification", warnings.get("streamerId").get(0).priority());
   }
 
   @Test
@@ -171,6 +172,23 @@ public class WarningCommandsControllerTest {
     assertEquals(1, warnings.get("streamerWithComponent").size());
     assertEquals("you have been warned", warnings.get("streamerWithComponent").get(0).message());
     assertEquals("chat", warnings.get("streamerWithComponent").get(0).component());
+    assertEquals("Notification", warnings.get("streamerWithComponent").get(0).priority());
+  }
+
+  @Test
+  public void testCreateWarningWithPriority() {
+    var command = new WarningCommandsController.AddWarningCommand(
+      "you have been warned",
+      null,
+      "Critical"
+    );
+
+    var response = controller.addWarning(auth("streamerWithPriority"), command);
+
+    assertEquals(HttpStatus.OK, response.join().getStatus());
+    assertEquals(1, warnings.get("streamerWithPriority").size());
+    assertEquals("you have been warned", warnings.get("streamerWithPriority").get(0).message());
+    assertEquals("Critical", warnings.get("streamerWithPriority").get(0).priority());
   }
 
   @Test
@@ -230,5 +248,6 @@ public class WarningCommandsControllerTest {
     assertEquals(1, warnings.get("streamerNoComponent").size());
     assertEquals("you have been warned", warnings.get("streamerNoComponent").get(0).message());
     assertEquals(null, warnings.get("streamerNoComponent").get(0).component());
+    assertEquals("Notification", warnings.get("streamerNoComponent").get(0).priority());
   }
 }
