@@ -32,20 +32,38 @@ Each domain module (`news`, `advice`, `feed`, `feedback`, `warning`) follows the
   - `XxxRepository` — `@Singleton` domain repository; generates String UUIDs via `com.fasterxml.uuid.Generators.timeBasedEpochGenerator()`.
 
 Key patterns:
-- **IDs are String UUIDs generated in the domain repository — no `@GeneratedValue`.** New entities must follow this, not auto-increment/identity columns.
+- **IDs are String UUIDs generated in the domain repository — no `@GeneratedValue`.** New entities must follow this, not auto-increment/identity columns. (Known deviation: `NewsFeedbackData` generates its own ID in its constructor.)
 - **Auth identity**: `BaseController.getOwnerId(auth)` returns the `preferred_username` claim. Commands are `@Secured(SecurityRule.IS_AUTHENTICATED)`; public reads use `@Secured(SecurityRule.IS_ANONYMOUS)`. Controllers extending `BaseController` must not reimplement `getOwnerId` (some older controllers, e.g. `StreamerFeedController`/`FeedbackCommandsController`, inline it instead — prefer `BaseController`).
 - **Shared libs**: `BaseController` and `ODALogger` come from `io.github.opendonationassistant:oda-commons`, pulled transitively via `oda-rabbit-conf`. The ODA libs version is pinned by `<oda.version>` (`0.11.232`).
-- **Flyway** migrations live in `src/main/resources/db/migration/`, schema `news`; add new ones as sequential `V{n}__*.sql`.
+- **Flyway** migrations live in `src/main/resources/db/migration/`, schema `news`; add new ones as sequential `V{n}__*.sql`. Tables have **no PK/FK constraints** — integrity is logical, enforced in the domain layer.
 - **Logging**: use `ODALogger` with structured `Map.of("key", value, ...)` context rather than string interpolation. `logback.xml` emits JSON lines.
 - **Events**: `Application.eventsFacade` exposes a `@Named("events") RabbitClient` that publishes to the `"notifications"` routing key (3rd constructor arg). Only `WarningCommandsController` uses it today, sending `AddedWarningEvent` (which implements `HasRecipientId`).
+
+Module quirks:
+- **warning has no database** — state lives in an in-memory Infinispan `VOLATILE` cache exposed as a raw `Map<String, List<WarningData>>` bean (`WarningCacheConfiguration.streamelementsCache`); warnings are lost on restart.
+- **feed depends on news** — `StreamerFeed`/`StreamerFeedRepository` use `NewsRepository` to compute "next unread news"; the cursor is `feed.last_read_news_id`.
+- **`GetRandomAdvice` is a GET read** but lives in `advice/commands/`; `advice/view/` holds only the `AdviceDto` record.
+- **`Application.java` is both main class and `@Factory`** — infra beans (RabbitClient, both Infinispan managers) live in the entry point.
+- **Dead code**: the `RemoteCacheManager` bean (nothing injects it) and an unused SLF4J `Logger` in `StreamerFeed`.
 
 ## Style & correctness
 
 - JSpecify nullability is enforced: annotate fields/params with `org.jspecify.annotations.@NonNull`/`@Nullable`; `package-info.java` marks the root package `@NullUnmarked`. NullAway fails the build otherwise.
 - `toString()` methods on domain/data classes emit hand-rolled JSON-ish strings — match that style when adding new entities.
-- Version is declared in multiple places that drift: `pom.xml` (`0.6.0`) vs the hardcoded `@Info(version = "0.5.0")` in `Application.java`. Update both when bumping.
+- Version is declared in multiple places that drift: `pom.xml` (`0.7.0`) vs the hardcoded `@Info(version = "0.7.0")` in `Application.java`. Currently in sync — update both when bumping.
 - OpenAPI spec is generated from `@OpenAPIDefinition`; `openapi-config.json` publishes a TypeScript client (`@opendonationassistant/oda-news-service-client`) to GitHub npm — only touch it when changing client generation.
+
+## Testing conventions
+
+- **Bean-invocation style**: controllers/commands are `@Inject`ed and called as Java objects — no HTTP layer, no `@TestHttpClient` (the `micronaut-http-client` dep is unused).
+- No `src/test/resources/` — Test Resources provisions Postgres from `pom.xml`; `application-allinone.yml` only sets `db-type: postgresql`.
+- Ordering assertions exploit `timeBasedEpochGenerator()` lexicographic sort (fabricate IDs with `Thread.sleep(10)`).
+- Warning tests mutate the real embedded Infinispan cache directly; each test seeds a distinct streamer key to stay isolated.
+- `awaitility` is declared but unused.
 
 ## Release
 
 - CI (`.github/workflows/maven.yml`): pushes to `main` (ignoring `README.md`) trigger `OpenDonationAssistant/oda-libraries`' reusable `release_service.yml`, which builds/deploys with `version = ${{ github.RUN_NUMBER }}`. There are no other checks locally — rely on `mvn test` for verification before pushing.
+- Tests actually run inside the Sonar step (`mvn verify ... sonar`); the later `clean package` step is `-DskipTests`.
+- `Dockerfile` copies only the native binary `target/oda-news-service` — it only builds under `-Dpackaging=native-image`.
+- Latent gap: `aot-${packaging}.properties` is referenced but only `aot-jar.properties` exists (native build runs without its AOT config).
