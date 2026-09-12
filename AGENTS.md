@@ -25,14 +25,14 @@ Each domain module (`news`, `advice`, `feed`, `feedback`, `warning`) follows the
 
 - `{module}/Xxx.java` — domain entity, typically holding its own `DataRepository` ref and exposing `asDto()`/`save()` (`News`, `Advice`). Simpler modules deviate: `NewsFeedback` is a plain POJO (its `Data` class exposes `asNewsFeedback()`), and `StreamerFeed` exposes `nextNews()`/`markAsRead()` instead.
 - `{module}/view/` — read/query `@Controller`s returning `@Serdeable` DTO records.
-- `{module}/commands/` — command endpoints (`@Controller` + `@Post("/.../commands/...")`), often nested `record` command bodies marked `@Serdeable`.
+- `{module}/commands/` — command endpoints (`@Controller` + `@Post("/.../commands/...")`), often nested `record` command bodies marked `@Serdeable` (odd one out: `CreateFeedbackCommand` is a standalone mutable class with `executeWith(...)`).
 - `{module}/repository/` — three files:
   - `XxxData` — `@MappedEntity` (table name in `@MappedEntity("...")`).
   - `XxxDataRepository` — `@JdbcRepository(dialect = Dialect.POSTGRES)` interface extending `CrudRepository<XxxData, String>`.
   - `XxxRepository` — `@Singleton` domain repository; generates String UUIDs via `com.fasterxml.uuid.Generators.timeBasedEpochGenerator()`.
 
 Key patterns:
-- **IDs are String UUIDs generated in the domain repository — no `@GeneratedValue`.** New entities must follow this, not auto-increment/identity columns. (Known deviation: `NewsFeedbackData` generates its own ID in its constructor.)
+- **IDs are String UUIDs generated in the domain repository — no `@GeneratedValue`.** New entities must follow this, not auto-increment/identity columns. (Known deviation: `NewsFeedbackData` generates its own ID in its constructor — and with `Generators.timeBasedGenerator()`, not `timeBasedEpochGenerator()`, so feedback IDs lack the lexicographic ordering property.)
 - **Auth identity**: `BaseController.getOwnerId(auth)` returns the `preferred_username` claim. Commands are `@Secured(SecurityRule.IS_AUTHENTICATED)`; public reads use `@Secured(SecurityRule.IS_ANONYMOUS)`. Controllers extending `BaseController` must not reimplement `getOwnerId` (some older controllers, e.g. `StreamerFeedController`/`FeedbackCommandsController`, inline it instead — prefer `BaseController`).
 - **Shared libs**: `BaseController` and `ODALogger` come from `io.github.opendonationassistant:oda-commons`, pulled transitively via `oda-rabbit-conf`. The ODA libs version is pinned by `<oda.version>` (`0.11.232`).
 - **Flyway** migrations live in `src/main/resources/db/migration/`, schema `news`; add new ones as sequential `V{n}__*.sql`. Tables have **no PK/FK constraints** — integrity is logical, enforced in the domain layer.
@@ -48,10 +48,13 @@ Module quirks:
 
 ## Style & correctness
 
-- JSpecify nullability is enforced: annotate fields/params with `org.jspecify.annotations.@NonNull`/`@Nullable`; `package-info.java` marks the root package `@NullUnmarked`. NullAway fails the build otherwise.
+- JSpecify nullability is enforced: annotate fields/params with `org.jspecify.annotations.@NonNull`/`@Nullable`; `package-info.java` marks the root package `@NullUnmarked`. NullAway fails the build otherwise. (Mixed style: `NewsController`/`StreamerFeedController` use `jakarta.annotation.Nonnull` instead — prefer JSpecify.)
 - `toString()` methods on domain/data classes emit hand-rolled JSON-ish strings — match that style when adding new entities.
-- Version is declared in multiple places that drift: `pom.xml` (`0.7.0`) vs the hardcoded `@Info(version = "0.7.0")` in `Application.java`. Currently in sync — update both when bumping.
-- OpenAPI spec is generated from `@OpenAPIDefinition`; `openapi-config.json` publishes a TypeScript client (`@opendonationassistant/oda-news-service-client`) to GitHub npm — only touch it when changing client generation.
+- `StreamerFeed.hasRead` compares `lastReadNewsId.compareTo(newsId)` where `newsId` is `@Nullable` — guard against NPE when touching it.
+- `WarningController`'s logger is a non-final `new ODALogger(this)`; other controllers use `ODALogger(ClassName.class)`.
+- No formatting/lint configs exist (no `.editorconfig`, checkstyle, or spotless) — match surrounding style by hand.
+- Version is declared in multiple places that drift: `pom.xml` (`0.8.0`) vs the hardcoded `@Info(version = "0.8.0")` in `Application.java`. Currently in sync — update both when bumping.
+- OpenAPI spec is generated from `@OpenAPIDefinition`; `openapi-config.json` configures a TypeScript client (`@opendonationassistant/oda-news-service-client`) for GitHub npm, but the current reusable CI workflow doesn't actually run client generation/publishing — only touch it when changing client generation.
 
 ## Testing conventions
 
@@ -63,7 +66,7 @@ Module quirks:
 
 ## Release
 
-- CI (`.github/workflows/maven.yml`): pushes to `main` (ignoring `README.md`) trigger `OpenDonationAssistant/oda-libraries`' reusable `release_service.yml`, which builds/deploys with `version = ${{ github.RUN_NUMBER }}`. There are no other checks locally — rely on `mvn test` for verification before pushing.
+- CI (`.github/workflows/maven.yml`): pushes to `main` (ignoring `README.md`) trigger `OpenDonationAssistant/oda-libraries`' reusable `release_service.yml`, which builds/pushes with `version = ${{ github.RUN_NUMBER }}` (deploy steps are commented out in the reusable workflow). There are no other checks locally — rely on `mvn test` for verification before pushing.
 - Tests actually run inside the Sonar step (`mvn verify ... sonar`); the later `clean package` step is `-DskipTests`.
 - `Dockerfile` copies only the native binary `target/oda-news-service` — it only builds under `-Dpackaging=native-image`.
 - Latent gap: `aot-${packaging}.properties` is referenced but only `aot-jar.properties` exists (native build runs without its AOT config).
