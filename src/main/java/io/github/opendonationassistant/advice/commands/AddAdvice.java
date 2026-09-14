@@ -3,6 +3,7 @@ package io.github.opendonationassistant.advice.commands;
 import io.github.opendonationassistant.advice.repository.AdviceRepository;
 import io.github.opendonationassistant.advice.view.AdviceDto;
 import io.github.opendonationassistant.commons.micronaut.BaseController;
+import io.github.opendonationassistant.advice.Advice;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
@@ -33,7 +34,7 @@ public class AddAdvice extends BaseController {
     if (ownerId.isEmpty()) {
       return HttpResponse.unauthorized();
     }
-    return HttpResponse.ok(adviceRepository.create(command.text()).asDto());
+    return HttpResponse.ok(AdviceDto.from(adviceRepository.create(command.text()).data()));
   }
 
   @Serdeable

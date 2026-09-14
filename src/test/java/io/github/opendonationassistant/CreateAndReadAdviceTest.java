@@ -49,7 +49,7 @@ public class CreateAndReadAdviceTest {
     assertEquals(command.text(), created.text());
 
     var saved = adviceDataRepository.findById(created.id());
-    assertEquals(command.text(), saved.get().getText());
+    assertEquals(command.text(), saved.get().text());
   }
 
   @Test
