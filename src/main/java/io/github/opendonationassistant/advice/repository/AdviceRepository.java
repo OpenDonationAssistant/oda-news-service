@@ -20,12 +20,14 @@ public class AdviceRepository {
     var id = Generators.timeBasedEpochGenerator().generate().toString();
     AdviceData data = new AdviceData(id, text);
     adviceDataRepository.save(data);
-    return data.asAdvice(adviceDataRepository);
+    return convert(data);
   }
 
   public Optional<Advice> getRandom() {
-    return adviceDataRepository
-      .findRandom()
-      .map(data -> data.asAdvice(adviceDataRepository));
+    return adviceDataRepository.findRandom().map(this::convert);
+  }
+
+  private Advice convert(AdviceData data) {
+    return new Advice(data, adviceDataRepository);
   }
 }

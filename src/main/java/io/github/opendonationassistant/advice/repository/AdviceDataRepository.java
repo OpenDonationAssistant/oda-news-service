@@ -7,8 +7,11 @@ import io.micronaut.data.repository.CrudRepository;
 import java.util.Optional;
 
 @JdbcRepository(dialect = Dialect.POSTGRES)
-public interface AdviceDataRepository extends CrudRepository<AdviceData, String> {
-
-  @Query(value = "SELECT * FROM advices ORDER BY random() LIMIT 1", nativeQuery = true)
+public interface AdviceDataRepository
+  extends CrudRepository<AdviceData, String> {
+  @Query(
+    value = "SELECT * FROM advices ORDER BY random() LIMIT 1",
+    nativeQuery = true
+  )
   Optional<AdviceData> findRandom();
 }

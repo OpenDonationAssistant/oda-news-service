@@ -30,7 +30,7 @@ public class GetRandomAdvice extends BaseController {
     }
     return adviceRepository
       .getRandom()
-      .map(advice -> HttpResponse.<AdviceDto>ok(advice.asDto()))
+      .map(advice -> HttpResponse.<AdviceDto>ok(AdviceDto.from(advice.data())))
       .orElseGet(HttpResponse::notFound);
   }
 }
