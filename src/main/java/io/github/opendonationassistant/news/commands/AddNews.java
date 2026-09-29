@@ -34,9 +34,11 @@ public class AddNews extends BaseController {
     if (ownerId.isEmpty()) {
       return HttpResponse.unauthorized();
     }
+    // An omitted `global` flag defaults to true; only an explicit false disables it.
+    var global = !Boolean.FALSE.equals(command.global());
     return HttpResponse.ok(
       newsRepository
-        .create(command.title(), command.description(), command.demoUrl(), command.global())
+        .create(command.title(), command.description(), command.demoUrl(), global)
         .asDto()
     );
   }

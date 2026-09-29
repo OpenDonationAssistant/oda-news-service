@@ -4,26 +4,23 @@ import io.github.opendonationassistant.feed.repository.StreamerFeedData;
 import io.github.opendonationassistant.feed.repository.StreamerFeedDataRepository;
 import io.github.opendonationassistant.news.News;
 import io.github.opendonationassistant.news.repository.NewsRepository;
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 import java.util.Objects;
 import java.util.Optional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public class StreamerFeed {
 
-  private final Logger log = LoggerFactory.getLogger(StreamerFeed.class);
-  private final @Nonnull String streamerId;
-  private final @Nonnull StreamerFeedDataRepository repository;
-  private final @Nonnull NewsRepository news;
+  private final @NonNull String streamerId;
+  private final @NonNull StreamerFeedDataRepository repository;
+  private final @NonNull NewsRepository news;
   private @Nullable String lastReadNewsId;
 
   public StreamerFeed(
-    @Nonnull String streamerId,
+    @NonNull String streamerId,
     @Nullable String lastReadNewsId,
-    @Nonnull StreamerFeedDataRepository repository,
-    @Nonnull NewsRepository news
+    @NonNull StreamerFeedDataRepository repository,
+    @NonNull NewsRepository news
   ) {
     this.streamerId = streamerId;
     this.lastReadNewsId = lastReadNewsId;
@@ -31,7 +28,7 @@ public class StreamerFeed {
     this.news = news;
   }
 
-  public @Nonnull Optional<News> nextNews() {
+  public @NonNull Optional<News> nextNews() {
     if (
       Objects.equals(lastReadNewsId, news.last().map(News::getId).orElse(null))
     ) {
@@ -40,13 +37,16 @@ public class StreamerFeed {
     return news.last();
   }
 
-  public void markAsRead(@Nonnull String newsId) {
+  public void markAsRead(@NonNull String newsId) {
     Objects.requireNonNull(newsId);
     this.lastReadNewsId = newsId;
     repository.update(new StreamerFeedData(streamerId, newsId));
   }
 
   public boolean hasRead(@Nullable String newsId) {
+    if (newsId == null) {
+      return true;
+    }
     if (lastReadNewsId == null) {
       return false;
     }

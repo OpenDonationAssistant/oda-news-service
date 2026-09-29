@@ -3,7 +3,6 @@ package io.github.opendonationassistant.feed;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -13,31 +12,43 @@ import io.github.opendonationassistant.news.News;
 import io.github.opendonationassistant.news.repository.NewsDataRepository;
 import io.github.opendonationassistant.news.repository.NewsRepository;
 import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 /**
- * Phase 0 safety net for {@link StreamerFeed}.
+ * Safety net for {@link StreamerFeed}.
  *
  * <p>Locks the intended "newest news only" semantics of {@code nextNews()} and the lexicographic
- * contract of {@code hasRead()} so later refactors cannot silently change them. The
- * {@code hasRead(null)} case characterizes a known defect; see the test comment.
+ * contract of {@code hasRead()} so later refactors cannot silently change them.
  */
-// NullAway does not model StreamerFeed's jakarta.annotation.Nullable constructor argument, so the
-// intentional null-boundary cases below need an explicit suppression.
-@SuppressWarnings("NullAway")
 class StreamerFeedSafetyNetTest {
 
-  private final NewsDataRepository newsDataRepository = mock(NewsDataRepository.class);
-  private final StreamerFeedDataRepository feedDataRepository =
-    mock(StreamerFeedDataRepository.class);
+  private final NewsDataRepository newsDataRepository = mock(
+    NewsDataRepository.class
+  );
+  private final StreamerFeedDataRepository feedDataRepository = mock(
+    StreamerFeedDataRepository.class
+  );
   private final NewsRepository newsRepository = mock(NewsRepository.class);
 
   private News news(String id) {
-    return new News(id, "title-" + id, "description-" + id, "2026-01-01", null, newsDataRepository);
+    return new News(
+      id,
+      "title-" + id,
+      "description-" + id,
+      "2026-01-01",
+      null,
+      newsDataRepository
+    );
   }
 
-  private StreamerFeed feed(String lastReadNewsId) {
-    return new StreamerFeed("streamer", lastReadNewsId, feedDataRepository, newsRepository);
+  private StreamerFeed feed(@Nullable String lastReadNewsId) {
+    return new StreamerFeed(
+      "streamer",
+      lastReadNewsId,
+      feedDataRepository,
+      newsRepository
+    );
   }
 
   @Test
@@ -96,9 +107,7 @@ class StreamerFeedSafetyNetTest {
   }
 
   @Test
-  void hasReadThrowsOnNullNewsId() {
-    // Characterization of defect #3: newsId is declared @Nullable but dereferenced.
-    // Phase 1 should make this return false instead of throwing.
-    assertThrows(NullPointerException.class, () -> feed("b").hasRead(null));
+  void hasReadIsFalseForNullNewsId() {
+    assertTrue(feed("b").hasRead(null));
   }
 }

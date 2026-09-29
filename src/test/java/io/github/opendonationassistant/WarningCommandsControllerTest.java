@@ -97,14 +97,14 @@ public class WarningCommandsControllerTest {
     var command = new WarningCommandsController.ClearWarningsCommand(
       List.of("chat")
     );
-    var response = controller.clearWarnings(auth("streamerByComponents"), command);
+    var response = controller.clearWarnings(
+      auth("streamerByComponents"),
+      command
+    );
 
     assertEquals(HttpStatus.OK, response.join().getStatus());
     assertEquals(
-      List.of(
-        warning("donation warning", "donation"),
-        warning("no component")
-      ),
+      List.of(warning("donation warning", "donation"), warning("no component")),
       warnings.get("streamerByComponents")
     );
   }
@@ -113,14 +113,10 @@ public class WarningCommandsControllerTest {
   public void testClearWarningsWithEmptyComponentsDeletesNothing() {
     warnings.put(
       "streamerEmptyComponents",
-      new java.util.ArrayList<>(
-        List.of(warning("chat warning", "chat"))
-      )
+      new java.util.ArrayList<>(List.of(warning("chat warning", "chat")))
     );
 
-    var command = new WarningCommandsController.ClearWarningsCommand(
-      List.of()
-    );
+    var command = new WarningCommandsController.ClearWarningsCommand(List.of());
     var response = controller.clearWarnings(
       auth("streamerEmptyComponents"),
       command
@@ -143,7 +139,10 @@ public class WarningCommandsControllerTest {
 
     assertEquals(HttpStatus.OK, response.join().getStatus());
     assertEquals(1, warnings.get("streamerId").size());
-    assertEquals("you have been warned", warnings.get("streamerId").get(0).message());
+    assertEquals(
+      "you have been warned",
+      warnings.get("streamerId").get(0).message()
+    );
     assertEquals(null, warnings.get("streamerId").get(0).component());
     assertEquals("Notification", warnings.get("streamerId").get(0).priority());
   }
@@ -171,13 +170,25 @@ public class WarningCommandsControllerTest {
       "chat"
     );
 
-    var response = controller.addWarning(auth("streamerWithComponent"), command);
+    var response = controller.addWarning(
+      auth("streamerWithComponent"),
+      command
+    );
 
     assertEquals(HttpStatus.OK, response.join().getStatus());
     assertEquals(1, warnings.get("streamerWithComponent").size());
-    assertEquals("you have been warned", warnings.get("streamerWithComponent").get(0).message());
-    assertEquals("chat", warnings.get("streamerWithComponent").get(0).component());
-    assertEquals("Notification", warnings.get("streamerWithComponent").get(0).priority());
+    assertEquals(
+      "you have been warned",
+      warnings.get("streamerWithComponent").get(0).message()
+    );
+    assertEquals(
+      "chat",
+      warnings.get("streamerWithComponent").get(0).component()
+    );
+    assertEquals(
+      "Notification",
+      warnings.get("streamerWithComponent").get(0).priority()
+    );
   }
 
   @Test
@@ -192,8 +203,14 @@ public class WarningCommandsControllerTest {
 
     assertEquals(HttpStatus.OK, response.join().getStatus());
     assertEquals(1, warnings.get("streamerWithPriority").size());
-    assertEquals("you have been warned", warnings.get("streamerWithPriority").get(0).message());
-    assertEquals("Critical", warnings.get("streamerWithPriority").get(0).priority());
+    assertEquals(
+      "you have been warned",
+      warnings.get("streamerWithPriority").get(0).message()
+    );
+    assertEquals(
+      "Critical",
+      warnings.get("streamerWithPriority").get(0).priority()
+    );
   }
 
   @Test
@@ -212,26 +229,30 @@ public class WarningCommandsControllerTest {
       "chat"
     );
 
-    var response = controller.addWarning(
-      auth("streamerOverride"),
-      command
-    );
+    var response = controller.addWarning(auth("streamerOverride"), command);
 
     assertEquals(HttpStatus.OK, response.join().getStatus());
     assertEquals(2, warnings.get("streamerOverride").size());
-    assertEquals("new chat warning", warnings.get("streamerOverride").get(0).message());
+    assertEquals(
+      "new chat warning",
+      warnings.get("streamerOverride").get(0).message()
+    );
     assertEquals("chat", warnings.get("streamerOverride").get(0).component());
-    assertEquals("donation warning", warnings.get("streamerOverride").get(1).message());
-    assertEquals("donation", warnings.get("streamerOverride").get(1).component());
+    assertEquals(
+      "donation warning",
+      warnings.get("streamerOverride").get(1).message()
+    );
+    assertEquals(
+      "donation",
+      warnings.get("streamerOverride").get(1).component()
+    );
   }
 
   @Test
   public void testAddWarningWithoutComponentAlwaysAppends() {
     warnings.put(
       "streamerNoComp",
-      new java.util.ArrayList<>(
-        List.of(warning("first"))
-      )
+      new java.util.ArrayList<>(List.of(warning("first")))
     );
     var command = new WarningCommandsController.AddWarningCommand("second");
 
@@ -251,9 +272,15 @@ public class WarningCommandsControllerTest {
 
     assertEquals(HttpStatus.OK, response.join().getStatus());
     assertEquals(1, warnings.get("streamerNoComponent").size());
-    assertEquals("you have been warned", warnings.get("streamerNoComponent").get(0).message());
+    assertEquals(
+      "you have been warned",
+      warnings.get("streamerNoComponent").get(0).message()
+    );
     assertEquals(null, warnings.get("streamerNoComponent").get(0).component());
-    assertEquals("Notification", warnings.get("streamerNoComponent").get(0).priority());
+    assertEquals(
+      "Notification",
+      warnings.get("streamerNoComponent").get(0).priority()
+    );
   }
 
   @Test

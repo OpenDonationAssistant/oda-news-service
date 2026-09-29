@@ -1,7 +1,6 @@
 package io.github.opendonationassistant;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -16,10 +15,10 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 /**
- * Phase 0 safety net for the {@code global} flag on news creation.
+ * Safety net for the {@code global} flag on news creation.
  *
- * <p>Locks the round-trip of a supplied {@code global} value and characterizes the known unboxing
- * defect when the field is omitted.
+ * <p>Locks the round-trip of a supplied {@code global} value and the default-to-true behavior when
+ * the field is omitted.
  */
 @MicronautTest(environments = "allinone")
 class AddNewsGlobalSafetyNetTest {
@@ -61,15 +60,13 @@ class AddNewsGlobalSafetyNetTest {
   }
 
   @Test
-  void createNewsThrowsWhenGlobalIsOmitted() {
-    // Characterization of defect #1: the Boolean command field is unboxed into a
-    // primitive boolean argument, so an omitted `global` yields a NullPointerException.
-    // Phase 1 should default an omitted global to true instead of throwing.
-    assertThrows(NullPointerException.class, () ->
-      addNews.addNews(
-        auth(),
-        new AddNewsCommand("title-null", "desc", null, null)
-      )
+  void createNewsDefaultsToGlobalTrueWhenOmitted() {
+    var created = addNews
+      .addNews(auth(), new AddNewsCommand("title-null", "desc", null, null))
+      .body();
+
+    assertTrue(
+      newsDataRepository.findById(created.id()).orElseThrow().isGlobal()
     );
   }
 }
