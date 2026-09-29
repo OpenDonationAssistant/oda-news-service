@@ -72,4 +72,20 @@ public class WarningControllerTest {
 
     assertEquals(List.of(), result.join().body());
   }
+
+  @Test
+  public void testGetWarningsHidesFreshOnlyWarnings() {
+    // Intentional behavior: warnings younger than 180s are not returned yet.
+    var freshTimestamp = System.currentTimeMillis();
+    warnings.put(
+      "streamerFreshOnly",
+      new java.util.ArrayList<>(
+        List.of(new WarningData("fresh", null, freshTimestamp))
+      )
+    );
+
+    var result = controller.getWarnings(auth("streamerFreshOnly"));
+
+    assertEquals(List.of(), result.join().body());
+  }
 }

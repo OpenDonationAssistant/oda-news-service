@@ -1,6 +1,7 @@
 package io.github.opendonationassistant;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
@@ -10,8 +11,12 @@ import io.micronaut.http.HttpStatus;
 import io.micronaut.security.authentication.Authentication;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
 
 @MicronautTest(environments = "allinone")
@@ -249,5 +254,39 @@ public class WarningCommandsControllerTest {
     assertEquals("you have been warned", warnings.get("streamerNoComponent").get(0).message());
     assertEquals(null, warnings.get("streamerNoComponent").get(0).component());
     assertEquals("Notification", warnings.get("streamerNoComponent").get(0).priority());
+  }
+
+  @Test
+  public void testConcurrentWarningsRemainWellFormed() throws Exception {
+    var recipient = "streamerConcurrent";
+    int attempts = 25;
+    var pool = Executors.newFixedThreadPool(8);
+    try {
+      List<Future<?>> futures = new ArrayList<>();
+      for (int i = 0; i < attempts; i++) {
+        final int index = i;
+        futures.add(
+          pool.submit(() ->
+            controller.addWarning(
+              auth(recipient),
+              new WarningCommandsController.AddWarningCommand(
+                "warning-" + index
+              )
+            )
+          )
+        );
+      }
+      for (var future : futures) {
+        future.get(10, TimeUnit.SECONDS);
+      }
+    } finally {
+      pool.shutdownNow();
+    }
+
+    var stored = warnings.getOrDefault(recipient, List.of());
+    // Characterization: the read-modify-write in addWarning is not atomic, so
+    // concurrent updates may be lost. Phase 2 should tighten this to == attempts.
+    assertFalse(stored.isEmpty());
+    assertTrue(stored.size() <= attempts);
   }
 }
