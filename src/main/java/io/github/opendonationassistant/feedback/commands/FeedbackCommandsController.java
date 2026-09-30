@@ -1,6 +1,8 @@
 package io.github.opendonationassistant.feedback.commands;
 
+import io.github.opendonationassistant.commons.micronaut.BaseController;
 import io.github.opendonationassistant.feedback.repository.NewsFeedbackRepository;
+import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.PathVariable;
@@ -8,10 +10,14 @@ import io.micronaut.http.annotation.Post;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.authentication.Authentication;
 import io.micronaut.security.rules.SecurityRule;
+import io.micronaut.validation.Validated;
 import jakarta.inject.Inject;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 
 @Controller("/news/{newsId}/feedback/commands")
-public class FeedbackCommandsController {
+@Validated
+public class FeedbackCommandsController extends BaseController {
 
   private final NewsFeedbackRepository feedbackRepository;
 
@@ -22,17 +28,16 @@ public class FeedbackCommandsController {
 
   @Post("/create")
   @Secured(SecurityRule.IS_AUTHENTICATED)
-  public void createFeedback(
-    @PathVariable String newsId,
+  public HttpResponse<Void> createFeedback(
+    @PathVariable @NotBlank String newsId,
     Authentication auth,
-    @Body CreateFeedbackCommand command
+    @Valid @Body CreateFeedbackCommand command
   ) {
-    command.executeWith(newsId, getOwnerId(auth), feedbackRepository);
-  }
-
-  private String getOwnerId(Authentication auth) {
-    return String.valueOf(
-      auth.getAttributes().getOrDefault("preferred_username", "")
-    );
+    var ownerId = getOwnerId(auth);
+    if (ownerId.isEmpty()) {
+      return HttpResponse.unauthorized();
+    }
+    command.executeWith(newsId, ownerId.get(), feedbackRepository);
+    return HttpResponse.ok();
   }
 }

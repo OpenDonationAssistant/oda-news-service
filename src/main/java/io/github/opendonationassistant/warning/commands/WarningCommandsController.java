@@ -13,8 +13,11 @@ import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.authentication.Authentication;
 import io.micronaut.security.rules.SecurityRule;
 import io.micronaut.serde.annotation.Serdeable;
+import io.micronaut.validation.Validated;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +25,7 @@ import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 
 @Controller
+@Validated
 public class WarningCommandsController extends BaseController {
 
   private final ODALogger log = new ODALogger(WarningCommandsController.class);
@@ -41,7 +45,7 @@ public class WarningCommandsController extends BaseController {
   @Secured(SecurityRule.IS_AUTHENTICATED)
   public HttpResponse<Void> clearWarnings(
     Authentication auth,
-    @Body ClearWarningsCommand command
+    @Valid @Body ClearWarningsCommand command
   ) {
     var ownerId = getOwnerId(auth);
     if (ownerId.isEmpty()) {
@@ -77,7 +81,7 @@ public class WarningCommandsController extends BaseController {
   @Secured(SecurityRule.IS_AUTHENTICATED)
   public HttpResponse<Void> addWarning(
     Authentication auth,
-    @Body AddWarningCommand command
+    @Valid @Body AddWarningCommand command
   ) {
     var recipientId = getOwnerId(auth);
     if (recipientId.isEmpty()) {
@@ -123,7 +127,7 @@ public class WarningCommandsController extends BaseController {
 
   @Serdeable
   public static record AddWarningCommand(
-    String message,
+    @NotBlank String message,
     @Nullable String component,
     @Nullable String priority
   ) {

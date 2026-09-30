@@ -11,11 +11,15 @@ import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.authentication.Authentication;
 import io.micronaut.security.rules.SecurityRule;
 import io.micronaut.serde.annotation.Serdeable;
+import io.micronaut.validation.Validated;
 import jakarta.inject.Inject;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import java.util.Map;
 import org.jspecify.annotations.NonNull;
 
 @Controller
+@Validated
 public class MarkRead extends BaseController {
 
   private final ODALogger log = new ODALogger(MarkRead.class);
@@ -30,7 +34,7 @@ public class MarkRead extends BaseController {
   @Secured(SecurityRule.IS_AUTHENTICATED)
   public HttpResponse<Void> markRead(
     @NonNull Authentication auth,
-    @Body MarkReadCommand command
+    @Valid @Body MarkReadCommand command
   ) {
     var ownerId = getOwnerId(auth);
     if (ownerId.isEmpty()) {
@@ -45,5 +49,5 @@ public class MarkRead extends BaseController {
   }
 
   @Serdeable
-  public static record MarkReadCommand(String guideId) {}
+  public static record MarkReadCommand(@NotBlank String guideId) {}
 }
