@@ -20,10 +20,8 @@ public class GuidesRepository {
     return dataRepository
       .findById(recipientId)
       .map(data -> new Guides(data, dataRepository))
-      .orElseGet(() -> {
-        var data = new GuidesData(recipientId, List.of());
-        dataRepository.save(data);
-        return new Guides(data, dataRepository);
-      });
+      .orElseGet(() ->
+        new Guides(new GuidesData(recipientId, List.of()), dataRepository)
+      );
   }
 }

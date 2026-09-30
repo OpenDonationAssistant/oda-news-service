@@ -49,6 +49,7 @@ public class News {
     result = prime * result + ((title == null) ? 0 : title.hashCode());
     result =
       prime * result + ((description == null) ? 0 : description.hashCode());
+    result = prime * result + ((date == null) ? 0 : date.hashCode());
     result = prime * result + ((demoUrl == null) ? 0 : demoUrl.hashCode());
     return result;
   }
@@ -68,6 +69,9 @@ public class News {
     if (description == null) {
       if (other.description != null) return false;
     } else if (!description.equals(other.description)) return false;
+    if (date == null) {
+      if (other.date != null) return false;
+    } else if (!date.equals(other.date)) return false;
     if (demoUrl == null) {
       if (other.demoUrl != null) return false;
     } else if (!demoUrl.equals(other.demoUrl)) return false;

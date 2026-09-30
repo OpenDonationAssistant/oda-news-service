@@ -1,5 +1,6 @@
 package io.github.opendonationassistant;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -65,15 +66,13 @@ class EmptyOwnerSafetyNetTest {
   }
 
   @Test
-  void feedIsCreatedUnderEmptyOwnerWhenUsernameIsMissing() {
-    // Characterization of defect #9: StreamerFeedController.getOwnerId returns "" when the claim
-    // is absent, so a feed row is created for the empty owner. Phase 3 should return 401.
+  void feedReadDoesNotPersistRow() {
     if (feedDataRepository.existsById("")) {
       feedDataRepository.deleteById("");
     }
 
     streamerFeedController.getFeed(authWithoutUsername());
 
-    assertTrue(feedDataRepository.existsById(""));
+    assertFalse(feedDataRepository.existsById(""));
   }
 }

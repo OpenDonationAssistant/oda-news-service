@@ -1,6 +1,5 @@
 package io.github.opendonationassistant.feedback.repository;
 
-import com.fasterxml.uuid.Generators;
 import io.github.opendonationassistant.feedback.NewsFeedback;
 import io.micronaut.data.annotation.Id;
 import io.micronaut.data.annotation.MappedEntity;
@@ -23,10 +22,6 @@ public class NewsFeedbackData {
     this.newsId = newsId;
     this.streamerId = streamerId;
     this.rating = rating;
-  }
-
-  public NewsFeedbackData(String newsId, String streamerId, int rating) {
-    this(Generators.timeBasedGenerator().generate().toString(), newsId, streamerId, rating);
   }
 
   public NewsFeedback asNewsFeedback() {

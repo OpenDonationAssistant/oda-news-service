@@ -7,7 +7,6 @@ import static org.mockito.Mockito.when;
 
 import com.fasterxml.uuid.Generators;
 import io.github.opendonationassistant.news.News;
-import java.util.List;
 import java.util.Optional;
 import org.instancio.junit.Given;
 import org.instancio.junit.InstancioExtension;
@@ -21,7 +20,8 @@ class NewsRepositoryTest {
 
   @Test
   void testReturningEmptyAfterLastNews(@Given NewsData last) {
-    when(newsDataRepository.findAll()).thenReturn(List.of(last));
+    when(newsDataRepository.findNextAfter(last.getId()))
+      .thenReturn(Optional.empty());
     Optional<News> actual = new NewsRepository(newsDataRepository)
       .nextAfter(last.getId());
     assertTrue(actual.isEmpty());
@@ -35,7 +35,7 @@ class NewsRepositoryTest {
     first.setId(Generators.timeBasedEpochGenerator().generate().toString());
     Thread.sleep(10);
     second.setId(Generators.timeBasedEpochGenerator().generate().toString());
-    when(newsDataRepository.findAll()).thenReturn(List.of(second, first));
+    when(newsDataRepository.findLast()).thenReturn(Optional.of(second));
     Optional<News> actual = new NewsRepository(newsDataRepository).last();
     assertTrue(actual.isPresent());
     assertEquals(second.asNews(newsDataRepository), actual.get());
@@ -53,8 +53,10 @@ class NewsRepositoryTest {
     Thread.sleep(10);
     third.setId(Generators.timeBasedEpochGenerator().generate().toString());
 
-    when(newsDataRepository.findAll())
-      .thenReturn(List.of(third, first, second));
+    when(newsDataRepository.findNextAfter(first.getId()))
+      .thenReturn(Optional.of(second));
+    when(newsDataRepository.findNextAfter(second.getId()))
+      .thenReturn(Optional.of(third));
 
     Optional<News> actual = new NewsRepository(newsDataRepository)
       .nextAfter(first.getId());

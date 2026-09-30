@@ -11,7 +11,6 @@ import io.github.opendonationassistant.news.repository.NewsDataRepository;
 import io.github.opendonationassistant.news.repository.NewsRepository;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
-import java.util.List;
 import java.util.Optional;
 import org.instancio.junit.Given;
 import org.instancio.junit.InstancioExtension;
@@ -42,9 +41,11 @@ public class StreamerFeedRepositoryIntegrationTest {
       newsRepository
     );
     final StreamerFeed feed = repository.get(streamerId);
-    assertTrue(dataRepository.existsById(streamerId));
+    assertFalse(dataRepository.existsById(streamerId));
     final Optional<News> nextNews = feed.nextNews();
     assertEquals(expectedNextNews, nextNews);
+    feed.markAsRead(news.getId());
+    assertTrue(dataRepository.existsById(streamerId));
   }
 
   @Test
@@ -63,7 +64,7 @@ public class StreamerFeedRepositoryIntegrationTest {
       "2024-01-01",
       "https://demo.url"
     );
-    when(newsDataRepository.findAll()).thenReturn(List.of(first, second));
+    when(newsDataRepository.findLast()).thenReturn(Optional.of(second));
     var newsRepository = new NewsRepository(newsDataRepository);
     final var repository = new StreamerFeedRepository(
       dataRepository,

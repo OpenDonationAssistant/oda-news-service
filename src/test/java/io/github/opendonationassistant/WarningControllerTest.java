@@ -39,7 +39,7 @@ public class WarningControllerTest {
 
     var result = controller.getWarnings(auth("streamerId"));
 
-    assertEquals(expected, result.join().body());
+    assertEquals(expected, result.body());
   }
 
   @Test
@@ -60,7 +60,7 @@ public class WarningControllerTest {
 
     assertEquals(
       List.of(new WarningData("old", null, oldTimestamp)),
-      result.join().body()
+      result.body()
     );
   }
 
@@ -70,7 +70,7 @@ public class WarningControllerTest {
 
     var result = controller.getWarnings(auth("unknown"));
 
-    assertEquals(List.of(), result.join().body());
+    assertEquals(List.of(), result.body());
   }
 
   @Test
@@ -86,6 +86,6 @@ public class WarningControllerTest {
 
     var result = controller.getWarnings(auth("streamerFreshOnly"));
 
-    assertEquals(List.of(), result.join().body());
+    assertEquals(List.of(), result.body());
   }
 }

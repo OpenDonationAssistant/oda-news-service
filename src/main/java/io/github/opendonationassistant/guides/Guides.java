@@ -3,7 +3,6 @@ package io.github.opendonationassistant.guides;
 import io.github.opendonationassistant.guides.repository.GuidesData;
 import io.github.opendonationassistant.guides.repository.GuidesDataRepository;
 import io.github.opendonationassistant.guides.view.GuidesDto;
-import java.util.ArrayList;
 import java.util.List;
 import org.jspecify.annotations.NonNull;
 
@@ -29,11 +28,6 @@ public class Guides {
   }
 
   public void markRead(@NonNull String guideId) {
-    if (!data.getIds().contains(guideId)) {
-      var newIds = new ArrayList<>(data.getIds());
-      newIds.add(guideId);
-      data.setIds(newIds);
-      repository.update(data);
-    }
+    repository.markRead(data.getRecipientId(), guideId);
   }
 }

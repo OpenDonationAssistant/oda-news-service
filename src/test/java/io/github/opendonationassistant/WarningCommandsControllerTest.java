@@ -1,7 +1,6 @@
 package io.github.opendonationassistant;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
@@ -51,7 +50,7 @@ public class WarningCommandsControllerTest {
     var command = new WarningCommandsController.ClearWarningsCommand(null);
     var response = controller.clearWarnings(auth("streamerId"), command);
 
-    assertEquals(HttpStatus.OK, response.join().getStatus());
+    assertEquals(HttpStatus.OK, response.getStatus());
     assertTrue(
       warnings.get("streamerId") == null || warnings.get("streamerId").isEmpty()
     );
@@ -65,7 +64,7 @@ public class WarningCommandsControllerTest {
     var command = new WarningCommandsController.ClearWarningsCommand(null);
     var response = controller.clearWarnings(auth("streamerA"), command);
 
-    assertEquals(HttpStatus.OK, response.join().getStatus());
+    assertEquals(HttpStatus.OK, response.getStatus());
     assertTrue(warnings.get("streamerA") == null);
     assertEquals(1, warnings.get("streamerB").size());
   }
@@ -78,7 +77,7 @@ public class WarningCommandsControllerTest {
     var command = new WarningCommandsController.ClearWarningsCommand(null);
     var response = controller.clearWarnings(auth, command);
 
-    assertEquals(HttpStatus.UNAUTHORIZED, response.join().getStatus());
+    assertEquals(HttpStatus.UNAUTHORIZED, response.getStatus());
   }
 
   @Test
@@ -102,7 +101,7 @@ public class WarningCommandsControllerTest {
       command
     );
 
-    assertEquals(HttpStatus.OK, response.join().getStatus());
+    assertEquals(HttpStatus.OK, response.getStatus());
     assertEquals(
       List.of(warning("donation warning", "donation"), warning("no component")),
       warnings.get("streamerByComponents")
@@ -122,7 +121,7 @@ public class WarningCommandsControllerTest {
       command
     );
 
-    assertEquals(HttpStatus.OK, response.join().getStatus());
+    assertEquals(HttpStatus.OK, response.getStatus());
     assertEquals(
       List.of(warning("chat warning", "chat")),
       warnings.get("streamerEmptyComponents")
@@ -137,7 +136,7 @@ public class WarningCommandsControllerTest {
 
     var response = controller.addWarning(auth("streamerId"), command);
 
-    assertEquals(HttpStatus.OK, response.join().getStatus());
+    assertEquals(HttpStatus.OK, response.getStatus());
     assertEquals(1, warnings.get("streamerId").size());
     assertEquals(
       "you have been warned",
@@ -159,7 +158,7 @@ public class WarningCommandsControllerTest {
 
     var response = controller.addWarning(auth("streamerId"), command);
 
-    assertEquals(HttpStatus.OK, response.join().getStatus());
+    assertEquals(HttpStatus.OK, response.getStatus());
     assertEquals(2, warnings.get("streamerId").size());
   }
 
@@ -175,7 +174,7 @@ public class WarningCommandsControllerTest {
       command
     );
 
-    assertEquals(HttpStatus.OK, response.join().getStatus());
+    assertEquals(HttpStatus.OK, response.getStatus());
     assertEquals(1, warnings.get("streamerWithComponent").size());
     assertEquals(
       "you have been warned",
@@ -201,7 +200,7 @@ public class WarningCommandsControllerTest {
 
     var response = controller.addWarning(auth("streamerWithPriority"), command);
 
-    assertEquals(HttpStatus.OK, response.join().getStatus());
+    assertEquals(HttpStatus.OK, response.getStatus());
     assertEquals(1, warnings.get("streamerWithPriority").size());
     assertEquals(
       "you have been warned",
@@ -231,7 +230,7 @@ public class WarningCommandsControllerTest {
 
     var response = controller.addWarning(auth("streamerOverride"), command);
 
-    assertEquals(HttpStatus.OK, response.join().getStatus());
+    assertEquals(HttpStatus.OK, response.getStatus());
     assertEquals(2, warnings.get("streamerOverride").size());
     assertEquals(
       "new chat warning",
@@ -258,7 +257,7 @@ public class WarningCommandsControllerTest {
 
     var response = controller.addWarning(auth("streamerNoComp"), command);
 
-    assertEquals(HttpStatus.OK, response.join().getStatus());
+    assertEquals(HttpStatus.OK, response.getStatus());
     assertEquals(2, warnings.get("streamerNoComp").size());
   }
 
@@ -270,7 +269,7 @@ public class WarningCommandsControllerTest {
 
     var response = controller.addWarning(auth("streamerNoComponent"), command);
 
-    assertEquals(HttpStatus.OK, response.join().getStatus());
+    assertEquals(HttpStatus.OK, response.getStatus());
     assertEquals(1, warnings.get("streamerNoComponent").size());
     assertEquals(
       "you have been warned",
@@ -311,9 +310,7 @@ public class WarningCommandsControllerTest {
     }
 
     var stored = warnings.getOrDefault(recipient, List.of());
-    // Characterization: the read-modify-write in addWarning is not atomic, so
-    // concurrent updates may be lost. Phase 2 should tighten this to == attempts.
-    assertFalse(stored.isEmpty());
-    assertTrue(stored.size() <= attempts);
+    // Atomic per-key updates (Phase 2.3): every concurrent add must be retained.
+    assertEquals(attempts, stored.size());
   }
 }

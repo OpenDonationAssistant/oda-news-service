@@ -22,9 +22,8 @@ public class StreamerFeedRepository {
     return repository
       .findById(streamerId)
       .map(data -> data.asStreamerFeed(repository, news))
-      .orElseGet(() -> {
-        repository.save(new StreamerFeedData(streamerId, null));
-        return new StreamerFeed(streamerId, null, repository, news);
-      });
+      .orElseGet(() ->
+        new StreamerFeed(streamerId, null, repository, news)
+      );
   }
 }

@@ -29,10 +29,7 @@ public class NewsRepository {
 
   public Optional<News> last() {
     return newsDataRepository
-      .findAll()
-      .stream()
-      .sorted((o1, o2) -> o2.getId().compareTo(o1.getId()))
-      .findFirst()
+      .findLast()
       .map(data -> data.asNews(newsDataRepository));
   }
 
@@ -44,11 +41,7 @@ public class NewsRepository {
 
   public Optional<News> nextAfter(String id) {
     return newsDataRepository
-      .findAll()
-      .stream()
-      .sorted((o1, o2) -> o1.getId().compareTo(o2.getId()))
-      .filter(data -> data.getId().compareTo(id) > 0)
-      .findFirst()
+      .findNextAfter(id)
       .map(data -> data.asNews(newsDataRepository));
   }
 

@@ -42,11 +42,11 @@ public class LoadingFeedTest {
       Map.of("preferred_username", "testuser")
     );
 
-    final List<NewsDto> shouldBeEmpty = controller.getFeed(auth);
+    final List<NewsDto> shouldBeEmpty = controller.getFeed(auth).body();
     assertTrue(shouldBeEmpty.isEmpty());
 
     addNews.addNews(auth, first);
-    final List<NewsDto> shouldBeOne = controller.getFeed(auth);
+    final List<NewsDto> shouldBeOne = controller.getFeed(auth).body();
     assertEquals(1, shouldBeOne.size());
     assertEquals(first.title(), shouldBeOne.get(0).title());
     assertEquals(first.description(), shouldBeOne.get(0).description());
@@ -57,11 +57,11 @@ public class LoadingFeedTest {
     );
     markAsRead.markAsRead(auth, markAsReadCommand);
 
-    final List<NewsDto> shouldBeEmptyAgain = controller.getFeed(auth);
+    final List<NewsDto> shouldBeEmptyAgain = controller.getFeed(auth).body();
     assertEquals(List.of(), shouldBeEmptyAgain);
 
     addNews.addNews(auth, second);
-    final List<NewsDto> shouldBeSecond = controller.getFeed(auth);
+    final List<NewsDto> shouldBeSecond = controller.getFeed(auth).body();
     assertEquals(1, shouldBeSecond.size());
     assertEquals(second.title(), shouldBeSecond.get(0).title());
     assertEquals(second.description(), shouldBeSecond.get(0).description());

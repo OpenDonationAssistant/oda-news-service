@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 import org.jspecify.annotations.Nullable;
 
 @Controller
@@ -40,13 +39,13 @@ public class WarningCommandsController extends BaseController {
 
   @Post("/warnings/commands/clear")
   @Secured(SecurityRule.IS_AUTHENTICATED)
-  public CompletableFuture<HttpResponse<Void>> clearWarnings(
+  public HttpResponse<Void> clearWarnings(
     Authentication auth,
     @Body ClearWarningsCommand command
   ) {
     var ownerId = getOwnerId(auth);
     if (ownerId.isEmpty()) {
-      return CompletableFuture.completedFuture(HttpResponse.unauthorized());
+      return HttpResponse.unauthorized();
     }
     log.info(
       "Clearing warnings",
@@ -57,75 +56,65 @@ public class WarningCommandsController extends BaseController {
         Optional.ofNullable(command.components()).orElse(List.of())
       )
     );
-    return CompletableFuture.supplyAsync(() -> {
-      var components = command.components();
-      if (components == null) {
-        warnings.remove(ownerId.get());
-      } else {
-        var list = new ArrayList<>(
-          warnings.getOrDefault(ownerId.get(), new ArrayList<>())
-        );
+    var components = command.components();
+    if (components == null) {
+      warnings.remove(ownerId.get());
+    } else {
+      warnings.computeIfPresent(ownerId.get(), (key, existing) -> {
+        var list = new ArrayList<>(existing);
         list.removeIf(
           warning ->
             warning.component() != null &&
             components.contains(warning.component())
         );
-        warnings.put(ownerId.get(), list);
-      }
-      return HttpResponse.ok();
-    });
+        return list;
+      });
+    }
+    return HttpResponse.ok();
   }
 
   @Post("/warnings/commands/create")
   @Secured(SecurityRule.IS_AUTHENTICATED)
-  public CompletableFuture<HttpResponse<Void>> addWarning(
+  public HttpResponse<Void> addWarning(
     Authentication auth,
     @Body AddWarningCommand command
   ) {
     var recipientId = getOwnerId(auth);
     if (recipientId.isEmpty()) {
-      return CompletableFuture.completedFuture(HttpResponse.unauthorized());
+      return HttpResponse.unauthorized();
     }
     log.info(
       "Adding warning",
       Map.of("recipientId", recipientId.get(), "message", command.message())
     );
-    return CompletableFuture.supplyAsync(() -> {
-      var list = new ArrayList<>(
-        warnings.getOrDefault(recipientId.get(), new ArrayList<>())
-      );
-      var newWarning = new WarningData(
-        command.message(),
-        command.component(),
-        System.currentTimeMillis(),
-        command.priority() == null ? "Notification" : command.priority()
-      );
-      var component = command.component();
+    var newWarning = new WarningData(
+      command.message(),
+      command.component(),
+      System.currentTimeMillis(),
+      command.priority() == null ? "Notification" : command.priority()
+    );
+    var component = command.component();
+    warnings.compute(recipientId.get(), (key, existing) -> {
+      var list = new ArrayList<>(existing == null ? List.of() : existing);
       if (component != null) {
-        var replaced = false;
         for (int i = 0; i < list.size(); i++) {
           if (component.equals(list.get(i).component())) {
             list.set(i, newWarning);
-            replaced = true;
-            break;
+            return list;
           }
         }
-        if (!replaced) {
-          list.add(newWarning);
-        }
-      } else {
-        list.add(newWarning);
       }
-      warnings.put(recipientId.get(), list);
-      try {
-        eventsFacade.sendEvent(
-          new AddedWarningEvent(recipientId.get(), command.message())
-        );
-      } catch (Exception e) {
-        log.error("Failed to send AddedWarningEvent", e);
-      }
-      return HttpResponse.ok();
+      list.add(newWarning);
+      return list;
     });
+    try {
+      eventsFacade.sendEvent(
+        new AddedWarningEvent(recipientId.get(), command.message())
+      );
+    } catch (Exception e) {
+      log.error("Failed to send AddedWarningEvent", e);
+    }
+    return HttpResponse.ok();
   }
 
   @Serdeable

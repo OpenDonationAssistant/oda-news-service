@@ -1,6 +1,5 @@
 package io.github.opendonationassistant.feed;
 
-import io.github.opendonationassistant.feed.repository.StreamerFeedData;
 import io.github.opendonationassistant.feed.repository.StreamerFeedDataRepository;
 import io.github.opendonationassistant.news.News;
 import io.github.opendonationassistant.news.repository.NewsRepository;
@@ -40,7 +39,7 @@ public class StreamerFeed {
   public void markAsRead(@NonNull String newsId) {
     Objects.requireNonNull(newsId);
     this.lastReadNewsId = newsId;
-    repository.update(new StreamerFeedData(streamerId, newsId));
+    repository.upsert(streamerId, newsId);
   }
 
   public boolean hasRead(@Nullable String newsId) {
