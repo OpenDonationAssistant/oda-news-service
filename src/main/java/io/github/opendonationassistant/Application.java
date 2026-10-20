@@ -22,7 +22,7 @@ import org.infinispan.manager.EmbeddedCacheManager;
 @OpenAPIDefinition(
   info = @Info(
     title = "ODA News Service",
-    version = "0.9.0",
+    version = "0.10.0",
     description = "News Service API",
     license = @License(
       name = "AGPL-3.0",

@@ -10,6 +10,7 @@ import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 @MicronautTest(environments = "allinone")
@@ -37,7 +38,7 @@ public class WarningControllerTest {
     );
     warnings.put("streamerId", expected);
 
-    var result = controller.getWarnings(auth("streamerId"));
+    var result = controller.getWarnings(auth("streamerId"), Optional.empty());
 
     assertEquals(expected, result.body());
   }
@@ -56,7 +57,7 @@ public class WarningControllerTest {
       )
     );
 
-    var result = controller.getWarnings(auth("streamerFilter"));
+    var result = controller.getWarnings(auth("streamerFilter"), Optional.empty());
 
     assertEquals(
       List.of(new WarningData("old", null, oldTimestamp)),
@@ -68,7 +69,7 @@ public class WarningControllerTest {
   public void testGetWarningsWhenNone() {
     warnings.clear();
 
-    var result = controller.getWarnings(auth("unknown"));
+    var result = controller.getWarnings(auth("unknown"), Optional.empty());
 
     assertEquals(List.of(), result.body());
   }
@@ -84,7 +85,49 @@ public class WarningControllerTest {
       )
     );
 
-    var result = controller.getWarnings(auth("streamerFreshOnly"));
+    var result = controller.getWarnings(auth("streamerFreshOnly"), Optional.empty());
+
+    assertEquals(List.of(), result.body());
+  }
+
+  @Test
+  public void testGetWarningsFiltersByPriority() {
+    var oldTimestamp = System.currentTimeMillis() - 200_000;
+    var error = new WarningData(
+      "error message",
+      null,
+      oldTimestamp,
+      "Error"
+    );
+    warnings.put(
+      "streamerPriority",
+      new java.util.ArrayList<>(
+        List.of(error, new WarningData("notification", null, oldTimestamp))
+      )
+    );
+
+    var result = controller.getWarnings(
+      auth("streamerPriority"),
+      Optional.of("Error")
+    );
+
+    assertEquals(List.of(error), result.body());
+  }
+
+  @Test
+  public void testGetWarningsWithUnmatchedPriorityReturnsEmpty() {
+    var oldTimestamp = System.currentTimeMillis() - 200_000;
+    warnings.put(
+      "streamerUnmatchedPriority",
+      new java.util.ArrayList<>(
+        List.of(new WarningData("notification", null, oldTimestamp))
+      )
+    );
+
+    var result = controller.getWarnings(
+      auth("streamerUnmatchedPriority"),
+      Optional.of("Error")
+    );
 
     assertEquals(List.of(), result.body());
   }

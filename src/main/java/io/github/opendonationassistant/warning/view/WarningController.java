@@ -6,11 +6,13 @@ import io.github.opendonationassistant.warning.repository.WarningData;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.QueryValue;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.authentication.Authentication;
 import io.micronaut.security.rules.SecurityRule;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Controller
 public class WarningController extends BaseController {
@@ -26,18 +28,28 @@ public class WarningController extends BaseController {
   @Get("/warnings")
   @Secured(SecurityRule.IS_AUTHENTICATED)
   public HttpResponse<List<WarningData>> getWarnings(
-    Authentication auth
+    Authentication auth,
+    @QueryValue Optional<String> priority
   ) {
     var recipientId = getOwnerId(auth);
     if (recipientId.isEmpty()) {
       return HttpResponse.unauthorized();
     }
-    log.debug("Getting warnings", Map.of("recipientId", recipientId.get()));
+    log.debug(
+      "Getting warnings",
+      Map.of(
+        "recipientId",
+        recipientId.get(),
+        "priority",
+        priority.orElse("any")
+      )
+    );
     var now = System.currentTimeMillis();
     var all = warnings.getOrDefault(recipientId.get(), List.of());
     var filtered = all
       .stream()
       .filter(w -> now - w.timestamp() > 180_000)
+      .filter(w -> priority.isEmpty() || priority.get().equals(w.priority()))
       .toList();
     return HttpResponse.ok(filtered);
   }
